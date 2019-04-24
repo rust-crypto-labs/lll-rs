@@ -1,0 +1,8 @@
+[package]
+name = "lll-rs"
+version = "0.1.0"
+authors = ["Rémi Géraud-Stewart <remi.geraud@ens.fr>", "Stanislas Plessia <stplessia@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rug = "0.6.0"
