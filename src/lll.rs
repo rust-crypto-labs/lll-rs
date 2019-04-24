@@ -47,7 +47,7 @@ pub fn lattice_reduce(basis: &mut Matrix<VectorF>) {
 
 pub fn big_lattice_reduce(basis: &mut Matrix<BigVector>){
         // Parameter delta in the Lovasz condition
-    let delta = Rational::from((3,4));
+    let delta = (3,4);
 
     let n = basis.dimension;
     let mut swap_condition = true;
@@ -71,7 +71,7 @@ pub fn big_lattice_reduce(basis: &mut Matrix<BigVector>){
             let b_i = &basis.columns[i];
             let b_ip1 = &basis.columns[i + 1];
 
-            let lhs =  delta.clone() * Rational::from(b_i.dot(&b_i));
+            let lhs =  Rational::from(delta) * Rational::from(b_i.dot(&b_i));
 
             let alpha = Rational::from((b_ip1.dot(&b_i) , b_i.dot(&b_i))).round();
             let vec_rhs = b_ip1.add(&b_i.mulf(alpha));

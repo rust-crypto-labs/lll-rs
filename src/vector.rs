@@ -191,7 +191,7 @@ impl Vector for BigVector {
 
         Self::from_vector(
             (0..n)
-                .map(|i| self.coefficients[i].clone() + other.get_coefficient(i))
+                .map(|i| Integer::from(&self.coefficients[i]) + other.get_coefficient(i))
                 .collect(),
         )
     }
@@ -204,7 +204,7 @@ impl Vector for BigVector {
 
         Self::from_vector(
             (0..n)
-                .map(|i| self.coefficients[i].clone() - other.get_coefficient(i))
+                .map(|i| Integer::from(&self.coefficients[i]) - other.get_coefficient(i))
                 .collect(),
         )
     }
@@ -216,7 +216,7 @@ impl BigVector {
      */
     pub fn get_coefficient(&self, position: usize) -> Integer {
         assert!(position < self.dimension());
-        self.coefficients[position].clone()
+        Integer::from(&self.coefficients[position])
     }
 
     /**
@@ -241,7 +241,7 @@ impl BigVector {
     pub fn mulf(&self, other: Integer) -> Self {
         let n = self.dimension();
 
-        Self::from_vector((0..n).map(|i| self.coefficients[i].clone() * other.clone()).collect())
+        Self::from_vector((0..n).map(|i| Integer::from(&self.coefficients[i]) * Integer::from(&other)).collect())
     }
 }
 
@@ -252,7 +252,7 @@ impl Dot<Integer> for BigVector {
         assert_eq!(n, other.dimension());
 
         (0..n)
-            .map(|i| self.coefficients[i].clone() * other.get_coefficient(i))
+            .map(|i| Integer::from(&self.coefficients[i]) * other.get_coefficient(i))
             .sum()
     }
 }
