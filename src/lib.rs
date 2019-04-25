@@ -30,11 +30,11 @@ mod test {
 
     #[test]
     fn test_big_lll(){
-         let matrix_type: Matrix<BigVector> = Matrix::init(3);
+        let matrix_type: Matrix<BigVector> = Matrix::init(3);
 
         // "Bad" lattice basis
         let mut basis = matrix_type.identity();
-        basis.columns[0] = BigVector::from_vector(vec![Integer::from(1) , Integer::from(0), Integer::from(0), Integer::from(1345)]);
+        basis.columns[0] = BigVector::from_vector(vec![Integer::from(1) << 100000 , Integer::from(0), Integer::from(0), Integer::from(1345)]);
         basis.columns[1] = BigVector::from_vector(vec![Integer::from(0), Integer::from(1), Integer::from(0), Integer::from(35)]);
         basis.columns[2] = BigVector::from_vector(vec![Integer::from(0), Integer::from(0), Integer::from(1), Integer::from(154)]);
         println!("{:?}", basis);
