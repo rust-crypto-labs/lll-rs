@@ -1,5 +1,6 @@
 use fmt::Debug;
 use std::fmt;
+use std::ops::{Index, IndexMut};
 
 use crate::vector::Vector;
 
@@ -28,6 +29,30 @@ impl<T: Vector> Matrix<T> {
             dimension: n,
         }
     }
+
+    pub fn swap(&mut self, i: usize, j: usize) {
+        self.columns.swap(i, j);
+    }
+}
+
+impl<T> Index<usize> for Matrix<T>
+where
+    T: Vector,
+{
+    type Output = T;
+
+    fn index(&self, index: usize) -> &T {
+        &self.columns[index]
+    }
+}
+
+impl<T> IndexMut<usize> for Matrix<T>
+where
+    T: Vector,
+{
+    fn index_mut(&mut self, index: usize) -> &mut T {
+        &mut self.columns[index]
+    }
 }
 
 impl<T> fmt::Debug for Matrix<T>
@@ -35,6 +60,6 @@ where
     T: Vector + Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}\n", self.columns)
+        writeln!(f, "{:?}\n", self.columns)
     }
 }
