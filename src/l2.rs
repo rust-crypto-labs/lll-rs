@@ -11,13 +11,13 @@ use std::cmp::Ordering;
 pub fn lattice_reduce(basis: &mut Matrix<VectorF>, eta: f64, delta: f64) {
     // Variables
     let d = basis.dimension;
-    let mut gram: Matrix<VectorF> = Matrix::init(d); // Gram matix
+    let mut gram: Matrix<VectorF> = Matrix::init(d); // Gram matrix (upper triangular)
     let mut r: Matrix<VectorF> = Matrix::init(d); // r_ij matrix
     let mut mu: Matrix<VectorF> = Matrix::init(d); // Gram coefficient matrix
 
     // Computing Gram matrix
     for i in 0..gram.dimension {
-        for j in 0..gram.dimension {
+        for j in i..gram.dimension {
             gram[i][j] = basis[i].dot(&basis[j]);
         }
     }
@@ -40,10 +40,13 @@ pub fn lattice_reduce(basis: &mut Matrix<VectorF>, eta: f64, delta: f64) {
 
             // Updating Gram matrix
             for j in 0..d {
-                gram[j][k] = basis[k].dot(&basis[j]);
-                gram[k][j] = basis[k].dot(&basis[j]);
-                gram[j][k - 1] = basis[k - 1].dot(&basis[j]);
-                gram[k - 1][j] = basis[k - 1].dot(&basis[j]);
+                if j < k {
+                    gram[k][j] = basis[k].dot(&basis[j]);
+                    gram[k - 1][j] = basis[k - 1].dot(&basis[j]);
+                } else {
+                    gram[j][k] = basis[k].dot(&basis[j]);
+                    gram[j][k - 1] = basis[k - 1].dot(&basis[j]);
+                }
             }
 
             // Updating mu and r
@@ -82,8 +85,11 @@ fn size_reduce(
 
             // Updating Gram matrix
             for j in 0..d {
-                gram[j][k] = basis[k].dot(&basis[j]);
-                gram[k][j] = basis[k].dot(&basis[j]);
+                if j < k {
+                    gram[k][j] = basis[k].dot(&basis[j]);
+                } else {
+                    gram[j][k] = basis[k].dot(&basis[j]);
+                }
             }
 
             for j in 0..i {
@@ -97,13 +103,13 @@ fn size_reduce(
 pub fn big_lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
     // Variables
     let d = basis.dimension;
-    let mut gram: Matrix<BigVector> = Matrix::init(d); // Gram matix
+    let mut gram: Matrix<BigVector> = Matrix::init(d); // Gram matrix (upper triangular)
     let mut r: Matrix<RationalVector> = Matrix::init(d); // r_ij matrix
     let mut mu: Matrix<RationalVector> = Matrix::init(d); // Gram coefficient matrix
 
     // Computing Gram matrix
     for i in 0..gram.dimension {
-        for j in 0..gram.dimension {
+        for j in i..gram.dimension {
             gram[i][j] = basis[i].dot(&basis[j]);
         }
     }
@@ -129,10 +135,13 @@ pub fn big_lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
 
             // Updating Gram matrix
             for j in 0..d {
-                gram[j][k] = basis[k].dot(&basis[j]);
-                gram[k][j] = basis[k].dot(&basis[j]);
-                gram[j][k - 1] = basis[k - 1].dot(&basis[j]);
-                gram[k - 1][j] = basis[k - 1].dot(&basis[j]);
+                if j < k {
+                    gram[k][j] = basis[k].dot(&basis[j]);
+                    gram[k - 1][j] = basis[k - 1].dot(&basis[j]);
+                } else {
+                    gram[j][k] = basis[k].dot(&basis[j]);
+                    gram[j][k - 1] = basis[k - 1].dot(&basis[j]);
+                }
             }
 
             // Updating mu and r
@@ -177,8 +186,11 @@ fn big_size_reduce(
 
             // Updating Gram matrix
             for j in 0..d {
-                gram[j][k] = basis[k].dot(&basis[j]);
-                gram[k][j] = basis[k].dot(&basis[j]);
+                if j < k {
+                    gram[k][j] = basis[k].dot(&basis[j]);
+                } else {
+                    gram[j][k] = basis[k].dot(&basis[j]);
+                }
             }
 
             for j in 0..i {
