@@ -5,7 +5,7 @@ authors = ["Rémi Géraud-Stewart <remi.geraud@ens.fr>", "Stanislas Plessia <stp
 edition = "2018"
 
 [dependencies]
-rug = "0.6.0"
+rug = "1.*"
 
 [dev-dependencies]
 criterion = "0.2"
