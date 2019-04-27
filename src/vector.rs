@@ -293,3 +293,127 @@ impl fmt::Debug for BigVector {
         write!(f, "{:?}", self.coefficients)
     }
 }
+
+pub struct RationalVector {
+    coefficients: Vec<Rational>,
+    dimension: usize,
+}
+
+impl Vector for RationalVector {
+    fn basis_vector(&self, position: usize) -> Self {
+        assert!(position < self.dimension);
+
+        let mut coefficients = vec![Rational::from(0); self.dimension()];
+        coefficients[position] = Rational::from(1);
+
+        Self {
+            coefficients,
+            dimension: self.dimension(),
+        }
+    }
+
+    fn init(dimension: usize) -> Self {
+        Self {
+            coefficients: vec![Default::default(); dimension],
+            dimension,
+        }
+    }
+
+    fn dimension(&self) -> usize {
+        self.dimension
+    }
+
+    fn add(&self, other: &Self) -> Self {
+        let n = self.dimension();
+
+        assert_eq!(n, other.dimension());
+
+        Self::from_vector(
+            (0..n)
+                .map(|i| Rational::from(&self.coefficients[i]) + other.get_coefficient(i))
+                .collect(),
+        )
+    }
+
+    fn sub(&self, other: &Self) -> Self {
+        let n = self.dimension();
+
+        assert_eq!(n, other.dimension());
+
+        Self::from_vector(
+            (0..n)
+                .map(|i| Rational::from(&self.coefficients[i]) - other.get_coefficient(i))
+                .collect(),
+        )
+    }
+}
+
+impl RationalVector {
+    /**
+     * Return vector coefficient
+     */
+    pub fn get_coefficient(&self, position: usize) -> Rational {
+        assert!(position < self.dimension());
+        Rational::from(&self.coefficients[position])
+    }
+
+    /**
+     * Set vector coefficient
+     */
+    pub fn set_coefficient(&mut self, position: usize, value: Rational) {
+        assert!(position < self.dimension());
+        self.coefficients[position] = value;
+    }
+
+    /**
+     * Create from a `Vec`
+     */
+    pub fn from_vector(coefficients: Vec<Rational>) -> Self {
+        Self {
+            dimension: coefficients.len(),
+            coefficients,
+        }
+    }
+
+    /// Multiplication by a scalar
+    pub fn mulf(&self, other: Rational) -> Self {
+        let n = self.dimension();
+
+        Self::from_vector(
+            (0..n)
+                .map(|i| Rational::from(&self.coefficients[i]) * Rational::from(&other))
+                .collect(),
+        )
+    }
+}
+
+impl Dot<Rational> for RationalVector {
+    fn dot(&self, other: &Self) -> Rational {
+        let n = self.dimension();
+        assert_eq!(n, other.dimension());
+
+        (0..n)
+            .map(|i| Rational::from(&self.coefficients[i]) * other.get_coefficient(i))
+            .sum()
+    }
+}
+
+impl Index<usize> for RationalVector {
+    type Output = Rational;
+
+    fn index(&self, index: usize) -> &Rational {
+        &self.coefficients[index]
+    }
+}
+
+impl IndexMut<usize> for RationalVector {
+    fn index_mut(&mut self, index: usize) -> &mut Rational {
+        &mut self.coefficients[index]
+    }
+}
+
+impl fmt::Debug for RationalVector {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self.coefficients)
+    }
+}
