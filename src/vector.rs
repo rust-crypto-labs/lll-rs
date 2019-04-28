@@ -150,6 +150,15 @@ impl VectorF {
     }
 }
 
+impl Clone for VectorF {
+    fn clone(&self) -> Self {
+        Self {
+            coefficients: self.coefficients.clone(),
+            dimension: self.dimension,
+        }
+    }
+}
+
 impl Index<usize> for VectorF {
     type Output = f64;
 
@@ -274,6 +283,15 @@ impl Dot<Integer> for BigVector {
     }
 }
 
+impl Clone for BigVector {
+    fn clone(&self) -> Self {
+        Self {
+            coefficients: self.coefficients.clone(),
+            dimension: self.dimension,
+        }
+    }
+}
+
 impl Index<usize> for BigVector {
     type Output = Integer;
 
@@ -395,6 +413,15 @@ impl Dot<Rational> for RationalVector {
         (0..n)
             .map(|i| Rational::from(&self.coefficients[i]) * other.get_coefficient(i))
             .sum()
+    }
+}
+
+impl Clone for RationalVector {
+    fn clone(&self) -> Self {
+        Self {
+            coefficients: self.coefficients.clone(),
+            dimension: self.dimension,
+        }
     }
 }
 
