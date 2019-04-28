@@ -11,23 +11,21 @@ mod benchmarks {
     use rug::*;
 
     pub fn bench_big_int_reduction(c: &mut Criterion) {
-        let matrix_type: Matrix<BigVector> = Matrix::init(3);
-
         // "Bad" lattice basis
-        let mut basis = matrix_type.identity();
-        basis.columns[0] = BigVector::from_vector(vec![
+        let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
+        basis[0] = BigVector::from_vector(vec![
             Integer::from(1) << 10000,
             Integer::from(0),
             Integer::from(0),
             Integer::from(1345) << 789,
         ]);
-        basis.columns[1] = BigVector::from_vector(vec![
+        basis[1] = BigVector::from_vector(vec![
             Integer::from(0),
             Integer::from(1) << 500,
             Integer::from(0),
             Integer::from(35) << 3505,
         ]);
-        basis.columns[2] = BigVector::from_vector(vec![
+        basis[2] = BigVector::from_vector(vec![
             Integer::from(0),
             Integer::from(0),
             Integer::from(1) << 1000,

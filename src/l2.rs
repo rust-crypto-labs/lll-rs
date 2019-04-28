@@ -10,14 +10,14 @@ use std::cmp::Ordering;
  */
 pub fn lattice_reduce(basis: &mut Matrix<VectorF>, eta: f64, delta: f64) {
     // Variables
-    let d = basis.dimension;
-    let mut gram: Matrix<VectorF> = Matrix::init(d); // Gram matrix (upper triangular)
-    let mut r: Matrix<VectorF> = Matrix::init(d); // r_ij matrix
-    let mut mu: Matrix<VectorF> = Matrix::init(d); // Gram coefficient matrix
+    let (d, _) = basis.dimensions();
+    let mut gram: Matrix<VectorF> = Matrix::init(d, d); // Gram matrix (upper triangular)
+    let mut r: Matrix<VectorF> = Matrix::init(d, d); // r_ij matrix
+    let mut mu: Matrix<VectorF> = Matrix::init(d, d); // Gram coefficient matrix
 
     // Computing Gram matrix
-    for i in 0..gram.dimension {
-        for j in i..gram.dimension {
+    for i in 0..d {
+        for j in 0..=i {
             gram[i][j] = basis[i].dot(&basis[j]);
         }
     }
@@ -73,7 +73,7 @@ fn size_reduce(
     eta: f64,
 ) {
     // Update mu and r
-    for i in 0..k {
+    for i in 0..=k {
         r[k][i] = gram[k][i] - (0..i).map(|index| mu[i][index] * r[k][index]).sum::<f64>();
         mu[k][i] = r[k][i] / r[i][i];
     }
@@ -102,14 +102,14 @@ fn size_reduce(
 
 pub fn big_lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
     // Variables
-    let d = basis.dimension;
-    let mut gram: Matrix<BigVector> = Matrix::init(d); // Gram matrix (upper triangular)
-    let mut r: Matrix<RationalVector> = Matrix::init(d); // r_ij matrix
-    let mut mu: Matrix<RationalVector> = Matrix::init(d); // Gram coefficient matrix
+    let (d, _) = basis.dimensions();
+    let mut gram: Matrix<BigVector> = Matrix::init(d, d); // Gram matrix (upper triangular)
+    let mut r: Matrix<RationalVector> = Matrix::init(d, d); // r_ij matrix
+    let mut mu: Matrix<RationalVector> = Matrix::init(d, d); // Gram coefficient matrix
 
     // Computing Gram matrix
-    for i in 0..gram.dimension {
-        for j in i..gram.dimension {
+    for i in 0..d {
+        for j in 0..=i {
             gram[i][j] = basis[i].dot(&basis[j]);
         }
     }
@@ -171,7 +171,7 @@ fn big_size_reduce(
     eta: &Rational,
 ) {
     // Update mu and r
-    for i in 0..k {
+    for i in 0..=k {
         r[k][i] = Rational::from(&gram[k][i])
             - (0..i)
                 .map(|index| Rational::from(&mu[i][index] * &r[k][index]))

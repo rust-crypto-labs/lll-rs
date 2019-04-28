@@ -6,19 +6,23 @@ use crate::vector::Vector;
 
 /// Matrix
 pub struct Matrix<T: Vector> {
-    pub columns: Vec<T>,
-    pub dimension: usize,
+    columns: Vec<T>,
+    dimensions: (usize, usize),
 }
 
-impl<T: Vector> Matrix<T> {
+impl<T: Vector> Matrix<T>
+where
+    T: Clone,
+{
     /// Initialise matrix type
-    pub fn init(dimension: usize) -> Self {
+    pub fn init(col_num: usize, col_dim: usize) -> Self {
         Self {
-            columns: vec![],
-            dimension,
+            columns: vec![T::init(col_dim); col_num],
+            dimensions: (col_num, col_dim),
         }
     }
 
+    /*
     /// Identity matrix
     pub fn identity(&self) -> Self {
         let n = self.dimension;
@@ -28,6 +32,13 @@ impl<T: Vector> Matrix<T> {
             columns: (0..n).map(|i| vector_type.basis_vector(i)).collect(),
             dimension: n,
         }
+    */
+
+    /**
+     * Return the matrix dimensions
+     */
+    pub fn dimensions(&self) -> (usize, usize) {
+        self.dimensions
     }
 
     pub fn swap(&mut self, i: usize, j: usize) {
