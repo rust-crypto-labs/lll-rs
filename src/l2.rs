@@ -1,5 +1,5 @@
 use crate::matrix::Matrix;
-use crate::rug::*;
+use crate::rug::{Integer, Rational};
 use crate::vector::{BigVector, Dot, RationalVector, Vector, VectorF};
 
 use std::cmp::max;

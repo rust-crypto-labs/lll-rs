@@ -1,5 +1,5 @@
 use crate::matrix::Matrix;
-use crate::rug::*;
+use crate::rug::{Integer, Rational};
 use crate::vector::{BigVector, Dot, Vector, VectorF};
 /**
  * Lattice reduction (Lenstra-Lenstra-Lovasz algorithm)
