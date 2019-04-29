@@ -67,7 +67,7 @@ mod test {
         println!("{:?}", basis);
 
         // "Good" lattice basis
-        l2::lattice_reduce(&mut basis, 0.5005, 0.999);
+        l2::lattice_reduce(&mut basis, 0.501, 0.998);
         println!("{:?}", basis);
     }
 
