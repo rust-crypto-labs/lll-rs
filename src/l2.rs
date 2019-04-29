@@ -33,7 +33,7 @@ pub fn lattice_reduce(basis: &mut Matrix<VectorF>, eta: f64, delta: f64) {
         size_reduce(k, d, basis, &mut gram, &mut mu, &mut r, eta_minus);
 
         // Lovazs condition
-        if delta_plus * mu[k - 1][k - 1] < r[k][k] + mu[k][k - 1] * mu[k][k - 1] * r[k - 1][k - 1] {
+        if delta_plus * r[k - 1][k - 1] < r[k][k] + mu[k][k - 1] * mu[k][k - 1] * r[k - 1][k - 1] {
             k += 1;
         } else {
             basis.swap(k, k - 1);
@@ -50,9 +50,12 @@ pub fn lattice_reduce(basis: &mut Matrix<VectorF>, eta: f64, delta: f64) {
             }
 
             // Updating mu and r
-            for i in 0..k {
-                r[k][i] = gram[k][i] - (0..i).map(|index| mu[i][index] * r[k][index]).sum::<f64>();
-                mu[k][i] = r[k][i] / r[i][i];
+            for i in 0..=k {
+                for j in 0..=i {
+                    r[i][j] =
+                        gram[i][j] - (0..j).map(|index| mu[j][index] * r[i][index]).sum::<f64>();
+                    mu[i][j] = r[i][j] / r[j][j];
+                }
             }
 
             k = max(1, k - 1);
@@ -95,8 +98,8 @@ fn size_reduce(
             for j in 0..i {
                 mu[k][j] -= x * mu[i][j];
             }
-            size_reduce(k, d, basis, gram, mu, r, eta);
         }
+        size_reduce(k, d, basis, gram, mu, r, eta);
     }
 }
 
@@ -124,7 +127,7 @@ pub fn big_lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
     while k < d {
         big_size_reduce(k, d, basis, &mut gram, &mut mu, &mut r, &eta_minus);
 
-        let delta_criterion = Rational::from(&delta_plus * &mu[k - 1][k - 1]);
+        let delta_criterion = Rational::from(&delta_plus * &r[k - 1][k - 1]);
         let scalar_criterion = &r[k][k] + Rational::from(&mu[k][k - 1] * &r[k - 1][k - 1]);
 
         // Lovazs condition
@@ -145,12 +148,14 @@ pub fn big_lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
             }
 
             // Updating mu and r
-            for i in 0..k {
-                r[k][i] = Rational::from(&gram[k][i])
-                    - (0..i)
-                        .map(|index| Rational::from(&mu[i][index]).square() * &r[k][index])
-                        .sum::<Rational>();
-                mu[k][i] = Rational::from(&r[k][i] / &r[i][i]);
+            for i in 0..=k {
+                for j in 0..=i {
+                    r[i][j] = Rational::from(&gram[i][j])
+                        - (0..j)
+                            .map(|index| Rational::from(&mu[j][index]).square() * &r[i][index])
+                            .sum::<Rational>();
+                    mu[i][j] = Rational::from(&r[i][j] / &r[j][j]);
+                }
             }
 
             k = max(1, k - 1);
@@ -197,7 +202,7 @@ fn big_size_reduce(
                 let shift = mu[i][j].clone();
                 mu[k][j] -= Rational::from(&x) * shift;
             }
-            big_size_reduce(k, d, basis, gram, mu, r, eta);
         }
+        big_size_reduce(k, d, basis, gram, mu, r, eta);
     }
 }
