@@ -1,4 +1,4 @@
-use rug::*;
+use rug::{Integer, Rational};
 use std::fmt;
 use std::ops::{Index, IndexMut};
 
@@ -28,6 +28,7 @@ pub trait Dot<T> {
 /**
  * Implementation of vectors in a vector space over the (field) `K`
  */
+#[derive(Clone)]
 pub struct VectorF {
     /// Underlying representation of the vector as a list of coefficients
     coefficients: Vec<f64>,
@@ -150,15 +151,6 @@ impl VectorF {
     }
 }
 
-impl Clone for VectorF {
-    fn clone(&self) -> Self {
-        Self {
-            coefficients: self.coefficients.clone(),
-            dimension: self.dimension,
-        }
-    }
-}
-
 impl Index<usize> for VectorF {
     type Output = f64;
 
@@ -179,6 +171,7 @@ impl fmt::Debug for VectorF {
     }
 }
 
+#[derive(Clone)]
 pub struct BigVector {
     coefficients: Vec<Integer>,
     dimension: usize,
@@ -283,15 +276,6 @@ impl Dot<Integer> for BigVector {
     }
 }
 
-impl Clone for BigVector {
-    fn clone(&self) -> Self {
-        Self {
-            coefficients: self.coefficients.clone(),
-            dimension: self.dimension,
-        }
-    }
-}
-
 impl Index<usize> for BigVector {
     type Output = Integer;
 
@@ -312,6 +296,7 @@ impl fmt::Debug for BigVector {
     }
 }
 
+#[derive(Clone)]
 pub struct RationalVector {
     coefficients: Vec<Rational>,
     dimension: usize,
@@ -413,15 +398,6 @@ impl Dot<Rational> for RationalVector {
         (0..n)
             .map(|i| Rational::from(&self.coefficients[i]) * other.get_coefficient(i))
             .sum()
-    }
-}
-
-impl Clone for RationalVector {
-    fn clone(&self) -> Self {
-        Self {
-            coefficients: self.coefficients.clone(),
-            dimension: self.dimension,
-        }
     }
 }
 
