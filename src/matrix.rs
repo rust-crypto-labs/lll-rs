@@ -22,18 +22,6 @@ where
         }
     }
 
-    /*
-    /// Identity matrix
-    pub fn identity(&self) -> Self {
-        let n = self.dimension;
-        let vector_type = T::init(n);
-
-        Self {
-            columns: (0..n).map(|i| vector_type.basis_vector(i)).collect(),
-            dimension: n,
-        }
-    */
-
     /**
      * Return the matrix dimensions
      */
