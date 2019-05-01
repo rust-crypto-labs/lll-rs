@@ -3,7 +3,6 @@ use crate::rug::{Integer, Rational};
 use crate::vector::{BigVector, Dot, RationalVector, Vector, VectorF};
 
 use std::cmp::max;
-use std::cmp::Ordering;
 
 /**
  * Lattice reduction (LLL² algorithm)
@@ -32,8 +31,11 @@ pub fn lattice_reduce(basis: &mut Matrix<VectorF>, eta: f64, delta: f64) {
     while k < d {
         size_reduce(k, d, basis, &mut gram, &mut mu, &mut r, eta_minus);
 
+        let delta_criterion = delta_plus * r[k - 1][k - 1];
+        let scalar_criterion = r[k][k] + r[k - 1][k - 1] * mu[k][k - 1].powi(2);
+
         // Lovazs condition
-        if delta_plus * r[k - 1][k - 1] < r[k][k] + mu[k][k - 1] * mu[k][k - 1] * r[k - 1][k - 1] {
+        if delta_criterion < scalar_criterion {
             k += 1;
         } else {
             basis.swap(k, k - 1);
@@ -125,7 +127,7 @@ pub fn big_lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
     let mut k = 1;
 
     while k < d {
-        big_size_reduce(k, d, basis, &mut gram, &mut mu, &mut r, &eta_minus);
+        big_size_reduce(k, d, basis, &mut gram, &mut mu, &mut r, eta_minus.clone());
 
         let delta_criterion = Rational::from(&delta_plus * &r[k - 1][k - 1]);
         let scalar_criterion = &r[k][k] + Rational::from(&mu[k][k - 1] * &r[k - 1][k - 1]);
@@ -173,7 +175,7 @@ fn big_size_reduce(
     gram: &mut Matrix<BigVector>,
     mu: &mut Matrix<RationalVector>,
     r: &mut Matrix<RationalVector>,
-    eta: &Rational,
+    eta: Rational,
 ) {
     // Update mu and r
     for i in 0..=k {
@@ -184,7 +186,7 @@ fn big_size_reduce(
         mu[k][i] = Rational::from(&r[k][i] / &r[i][i]);
     }
 
-    if (0..k).any(|index| eta.cmp_abs(&mu[k][index]) == Ordering::Less) {
+    if (0..k).any(|index| mu[k][index] > eta) {
         for i in (0..k).rev() {
             let (_, x) = mu[k][i].clone().fract_round(Integer::new());
             basis[k] = basis[k].sub(&basis[i].mulf(x.clone()));
