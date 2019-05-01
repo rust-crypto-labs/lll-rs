@@ -81,7 +81,7 @@ impl Vector for VectorF {
 
         Self::from_vector(
             (0..n)
-                .map(|i| self.coefficients[i] + other.get_coefficient(i))
+                .map(|i| self.coefficients[i] + other.coefficients[i])
                 .collect(),
         )
     }
@@ -96,7 +96,7 @@ impl Vector for VectorF {
 
         Self::from_vector(
             (0..n)
-                .map(|i| self.coefficients[i] - other.get_coefficient(i))
+                .map(|i| self.coefficients[i] - other.coefficients[i])
                 .collect(),
         )
     }
@@ -111,28 +111,12 @@ impl Dot<f64> for VectorF {
         assert_eq!(n, other.dimension());
 
         (0..n)
-            .map(|i| self.coefficients[i] * other.get_coefficient(i))
+            .map(|i| self.coefficients[i] * other.coefficients[i])
             .sum()
     }
 }
 
 impl VectorF {
-    /**
-     * Return vector coefficient
-     */
-    pub fn get_coefficient(&self, position: usize) -> f64 {
-        assert!(position < self.dimension());
-        self.coefficients[position]
-    }
-
-    /**
-     * Set vector coefficient
-     */
-    pub fn set_coefficient(&mut self, position: usize, value: f64) {
-        assert!(position < self.dimension());
-        self.coefficients[position] = value;
-    }
-
     /**
      * Create from a `Vec`
      */
@@ -208,7 +192,7 @@ impl Vector for BigVector {
 
         Self::from_vector(
             (0..n)
-                .map(|i| Integer::from(&self.coefficients[i]) + other.get_coefficient(i))
+                .map(|i| Integer::from(&self.coefficients[i] + &other.coefficients[i]))
                 .collect(),
         )
     }
@@ -220,29 +204,13 @@ impl Vector for BigVector {
 
         Self::from_vector(
             (0..n)
-                .map(|i| Integer::from(&self.coefficients[i]) - other.get_coefficient(i))
+                .map(|i| Integer::from(&self.coefficients[i] - &other.coefficients[i]))
                 .collect(),
         )
     }
 }
 
 impl BigVector {
-    /**
-     * Return vector coefficient
-     */
-    pub fn get_coefficient(&self, position: usize) -> Integer {
-        assert!(position < self.dimension());
-        Integer::from(&self.coefficients[position])
-    }
-
-    /**
-     * Set vector coefficient
-     */
-    pub fn set_coefficient(&mut self, position: usize, value: Integer) {
-        assert!(position < self.dimension());
-        self.coefficients[position] = value;
-    }
-
     /**
      * Create from a `Vec`
      */
@@ -259,7 +227,7 @@ impl BigVector {
 
         Self::from_vector(
             (0..n)
-                .map(|i| Integer::from(&self.coefficients[i]) * Integer::from(&other))
+                .map(|i| Integer::from(&self.coefficients[i] * &other))
                 .collect(),
         )
     }
@@ -271,7 +239,7 @@ impl Dot<Integer> for BigVector {
         assert_eq!(n, other.dimension());
 
         (0..n)
-            .map(|i| Integer::from(&self.coefficients[i]) * other.get_coefficient(i))
+            .map(|i| Integer::from(&self.coefficients[i] * &other.coefficients[i]))
             .sum()
     }
 }
@@ -333,7 +301,7 @@ impl Vector for RationalVector {
 
         Self::from_vector(
             (0..n)
-                .map(|i| Rational::from(&self.coefficients[i]) + other.get_coefficient(i))
+                .map(|i| Rational::from(&self.coefficients[i] + &other.coefficients[i]))
                 .collect(),
         )
     }
@@ -345,29 +313,13 @@ impl Vector for RationalVector {
 
         Self::from_vector(
             (0..n)
-                .map(|i| Rational::from(&self.coefficients[i]) - other.get_coefficient(i))
+                .map(|i| Rational::from(&self.coefficients[i] - &other.coefficients[i]))
                 .collect(),
         )
     }
 }
 
 impl RationalVector {
-    /**
-     * Return vector coefficient
-     */
-    pub fn get_coefficient(&self, position: usize) -> Rational {
-        assert!(position < self.dimension());
-        Rational::from(&self.coefficients[position])
-    }
-
-    /**
-     * Set vector coefficient
-     */
-    pub fn set_coefficient(&mut self, position: usize, value: Rational) {
-        assert!(position < self.dimension());
-        self.coefficients[position] = value;
-    }
-
     /**
      * Create from a `Vec`
      */
@@ -384,7 +336,7 @@ impl RationalVector {
 
         Self::from_vector(
             (0..n)
-                .map(|i| Rational::from(&self.coefficients[i]) * Rational::from(&other))
+                .map(|i| Rational::from(&self.coefficients[i] * &other))
                 .collect(),
         )
     }
@@ -396,7 +348,7 @@ impl Dot<Rational> for RationalVector {
         assert_eq!(n, other.dimension());
 
         (0..n)
-            .map(|i| Rational::from(&self.coefficients[i]) * other.get_coefficient(i))
+            .map(|i| Rational::from(&self.coefficients[i] * &other.coefficients[i]))
             .sum()
     }
 }
