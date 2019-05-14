@@ -1,12 +1,18 @@
-use fmt::Debug;
-use std::fmt;
-use std::ops::{Index, IndexMut};
-
 use crate::vector::Vector;
 
-/// Matrix
+use std::{
+    fmt::{self, Debug},
+    ops::{Index, IndexMut},
+};
+
+/**
+* A `Matrix` is a collection of `Vector`s
+*/
 pub struct Matrix<T: Vector> {
+    /// Internal representation as a list of elements of type `T`
     columns: Vec<T>,
+
+    /// Dimensions of the matrix
     dimensions: (usize, usize),
 }
 
@@ -14,7 +20,11 @@ impl<T: Vector> Matrix<T>
 where
     T: Clone,
 {
-    /// Initialise matrix type
+    /**
+     * Initialise an empty `Matrix`
+     *      - `col_num`: number of columns
+     *      - `col_dim`: number of rows
+     */
     pub fn init(col_num: usize, col_dim: usize) -> Self {
         Self {
             columns: vec![T::init(col_dim); col_num],
@@ -29,11 +39,13 @@ where
         self.dimensions
     }
 
+    /// Swap two columns of the matrix
     pub fn swap(&mut self, i: usize, j: usize) {
         self.columns.swap(i, j);
     }
 }
 
+/// Direct access to a column
 impl<T> Index<usize> for Matrix<T>
 where
     T: Vector,
@@ -45,6 +57,7 @@ where
     }
 }
 
+/// Direct access to a column (mutable)
 impl<T> IndexMut<usize> for Matrix<T>
 where
     T: Vector,

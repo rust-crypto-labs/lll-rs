@@ -5,10 +5,9 @@ extern crate rug;
 
 mod benchmarks {
     use criterion::Criterion;
-    use lll_rs::lll;
-    use lll_rs::l2;
-    use lll_rs::matrix::Matrix;
-    use lll_rs::vector::BigVector;
+
+    use lll_rs::{l2, lll, matrix::Matrix, vector::BigVector};
+
     use rug::Integer;
 
     pub fn bench_big_int_reduction_lll(c: &mut Criterion) {
@@ -33,12 +32,12 @@ mod benchmarks {
             Integer::from(154) << 5000,
         ]);
 
-        c.bench_function("big_lattice_reduce_lll", move |b| {
-            b.iter(|| lll::big_lattice_reduce(&mut basis))
+        c.bench_function("lattice_reduce (biglll)", move |b| {
+            b.iter(|| biglll::lattice_reduce(&mut basis))
         });
     }
 
-        pub fn bench_big_int_reduction_l2(c: &mut Criterion) {
+    pub fn bench_big_int_reduction_l2(c: &mut Criterion) {
         // "Bad" lattice basis
         let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
         basis[0] = BigVector::from_vector(vec![
@@ -60,8 +59,8 @@ mod benchmarks {
             Integer::from(154) << 5000,
         ]);
 
-        c.bench_function("big_lattice_reduce_l2", move |b| {
-            b.iter(|| l2::big_lattice_reduce(&mut basis, 0.501, 0.998))
+        c.bench_function("lattice_reduce (bigl2)", move |b| {
+            b.iter(|| bigl2::lattice_reduce(&mut basis, 0.501, 0.998))
         });
     }
 }

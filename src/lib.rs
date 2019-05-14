@@ -8,14 +8,17 @@ pub mod vector;
 
 #[cfg(test)]
 mod test {
-    use crate::l2;
-    use crate::lll;
-    use crate::matrix::Matrix;
-    use crate::rug::Integer;
-    use crate::vector::{BigVector, VectorF};
+    use crate::{
+        l2::{bigl2, l2f},
+        lll::{biglll, lllf},
+        matrix::Matrix,
+        vector::{BigVector, VectorF},
+    };
+
+    use rug::Integer;
 
     #[test]
-    fn test_lll() {
+    fn test_lllf() {
         // "Bad" lattice basis
         let mut basis: Matrix<VectorF> = Matrix::init(3, 4);
         basis[0] = VectorF::from_vector(vec![1., 0., 0., 1345.]);
@@ -24,12 +27,12 @@ mod test {
         println!("{:?}", basis);
 
         // "Good" lattice basis
-        lll::lattice_reduce(&mut basis);
+        lllf::lattice_reduce(&mut basis);
         println!("{:?}", basis);
     }
 
     #[test]
-    fn test_big_lll() {
+    fn test_biglll() {
         // "Bad" lattice basis
         let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
         basis[0] = BigVector::from_vector(vec![
@@ -53,12 +56,12 @@ mod test {
         println!("{:?}", basis);
 
         // "Good" lattice basis
-        lll::big_lattice_reduce(&mut basis);
+        biglll::lattice_reduce(&mut basis);
         println!("{:?}", basis);
     }
 
     #[test]
-    fn test_l2() {
+    fn test_l2f() {
         // "Bad" lattice basis
         let mut basis: Matrix<VectorF> = Matrix::init(3, 4);
         basis[0] = VectorF::from_vector(vec![1., 0., 0., 1345.]);
@@ -67,12 +70,12 @@ mod test {
         println!("{:?}", basis);
 
         // "Good" lattice basis
-        l2::lattice_reduce(&mut basis, 0.501, 0.998);
+        l2f::lattice_reduce(&mut basis, 0.501, 0.998);
         println!("{:?}", basis);
     }
 
     #[test]
-    fn test_big_l2() {
+    fn test_bigl2() {
         // "Bad" lattice basis
         let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
         basis[0] = BigVector::from_vector(vec![
@@ -96,7 +99,7 @@ mod test {
         println!("{:?}", basis);
 
         // "Good" lattice basis
-        l2::big_lattice_reduce(&mut basis, 0.5005, 0.999);
+        bigl2::lattice_reduce(&mut basis, 0.5005, 0.999);
         println!("{:?}", basis);
     }
 }
