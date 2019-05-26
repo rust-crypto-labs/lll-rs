@@ -12,6 +12,10 @@ use std::cmp::max;
  * Here `basis` is a generating matrix for the lattice. TODO: explain `eta` and `delta`
  *
  * The basis is reduced in-place.
+ * 
+ * # Panics
+ * if delta <= 1/4 or delta >= 1  
+ * if eta <= 1/2 or eta > sqrt(delta)
  */
 pub fn lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
     assert!(0.25<delta && delta<1.);
