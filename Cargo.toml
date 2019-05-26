@@ -1,11 +1,11 @@
 [package]
 name = "lll-rs"
 version = "0.1.0"
-authors = ["Rémi Géraud-Stewart <remi.geraud@ens.fr>", "Stanislas Plessia <stplessia@gmail.com>"]
+authors = ["Rémi Géraud-Stewart <remi.geraud@ens.fr>", "Stanislas Plessia <stplessia@gmail.com>, Edmond de Roffignac <edmond.de-roffignac@student.ecp.fr>"]
 edition = "2018"
 
 [dependencies]
-rug = "0.6.0"
+rug = "1.*"
 
 [dev-dependencies]
 criterion = "0.2"
