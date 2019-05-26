@@ -23,7 +23,7 @@ impl Vector for VectorF {
      *  `position`: number of the basis vector (0..n)
      */
     fn basis_vector(&self, position: usize) -> Self {
-        assert!(position < self.dimension);
+        assert!(position < self.dimension());
 
         let mut coefficients = vec![0.0; self.dimension()];
         coefficients[position] = 1.0;

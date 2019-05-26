@@ -71,7 +71,7 @@ impl Vector for RationalVector {
 
 impl RationalVector {
     /**
-     * Create an instance from a `Vec` of `Rational`s
+     * Create an instance from a `Vec` of `Rational`
      */
     pub fn from_vector(coefficients: Vec<Rational>) -> Self {
         Self {

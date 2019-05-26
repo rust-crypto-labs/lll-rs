@@ -14,6 +14,8 @@ use std::cmp::max;
  * The basis is reduced in-place.
  */
 pub fn lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
+    assert!(0.25<delta && delta<1.);
+    assert!(0.5<eta && eta*eta<delta);
     // Variables
     let (d, _) = basis.dimensions();
     let mut gram: Matrix<BigVector> = Matrix::init(d, d); // Gram matrix (upper triangular)
@@ -35,7 +37,7 @@ pub fn lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
     let mut k = 1;
 
     while k < d {
-        size_reduce(k, d, basis, &mut gram, &mut mu, &mut r, eta_minus.clone());
+        size_reduce(k, d, basis, &mut gram, &mut mu, &mut r, Rational::from(&eta_minus));
 
         let delta_criterion = Rational::from(&delta_plus * &r[k - 1][k - 1]);
         let scalar_criterion = &r[k][k] + Rational::from(&mu[k][k - 1] * &r[k - 1][k - 1]);
@@ -119,7 +121,7 @@ fn size_reduce(
             }
 
             for j in 0..i {
-                let shift = mu[i][j].clone();
+                let shift = Rational::from(&mu[i][j]);
                 mu[k][j] -= Rational::from(&x) * shift;
             }
         }

@@ -17,6 +17,8 @@ use std::cmp::max;
  * The basis is reduced in-place.
  */
 pub fn lattice_reduce(basis: &mut Matrix<VectorF>, eta: f64, delta: f64) {
+    assert!(0.25<delta && delta<1.);
+    assert!(0.5<eta && eta*eta<delta);
     // Variables
     let (d, _) = basis.dimensions();
     let mut gram: Matrix<VectorF> = Matrix::init(d, d); // Gram matrix (upper triangular)
