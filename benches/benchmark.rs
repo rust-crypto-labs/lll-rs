@@ -33,7 +33,7 @@ mod benchmarks {
         ]);
 
         c.bench_function("lattice_reduce (biglll)", move |b| {
-            b.iter(|| biglll::lattice_reduce(&mut basis))
+            b.iter(|| lll::biglll::lattice_reduce(&mut basis))
         });
     }
 
@@ -60,7 +60,7 @@ mod benchmarks {
         ]);
 
         c.bench_function("lattice_reduce (bigl2)", move |b| {
-            b.iter(|| bigl2::lattice_reduce(&mut basis, 0.501, 0.998))
+            b.iter(|| l2::bigl2::lattice_reduce(&mut basis, 0.501, 0.998))
         });
     }
 }
