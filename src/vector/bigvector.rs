@@ -81,12 +81,12 @@ impl BigVector {
     }
 
     /// Multiplication by a scalar
-    pub fn mulf(&self, other: Integer) -> Self {
+    pub fn mulf(&self, other: &Integer) -> Self {
         let n = self.dimension();
 
         Self::from_vector(
             (0..n)
-                .map(|i| Integer::from(&self.coefficients[i] * &other))
+                .map(|i| Integer::from(&self.coefficients[i] * other))
                 .collect(),
         )
     }

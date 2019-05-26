@@ -29,7 +29,7 @@ pub fn lattice_reduce(basis: &mut Matrix<BigVector>) {
                 let b_j = &basis[j];
                 let (_, alpha) =
                     Rational::from((b_i.dot(&b_j), b_j.dot(&b_j))).fract_round(Integer::new());
-                basis[i] = b_i.sub(&b_j.mulf(alpha));
+                basis[i] = b_i.sub(&b_j.mulf(&alpha));
             }
         }
 
@@ -43,7 +43,7 @@ pub fn lattice_reduce(basis: &mut Matrix<BigVector>) {
 
             let (_, alpha) =
                 Rational::from((b_ip1.dot(&b_i), b_i.dot(&b_i))).fract_round(Integer::new());
-            let vec_rhs = b_ip1.add(&b_i.mulf(alpha));
+            let vec_rhs = b_ip1.add(&b_i.mulf(&alpha));
             let rhs = vec_rhs.dot(&vec_rhs);
 
             if lhs > rhs {

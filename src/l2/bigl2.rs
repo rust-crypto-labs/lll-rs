@@ -108,8 +108,8 @@ fn size_reduce(
 
     if (0..k).any(|index| mu[k][index] > eta) {
         for i in (0..k).rev() {
-            let (_, x) = mu[k][i].clone().fract_round(Integer::new());
-            basis[k] = basis[k].sub(&basis[i].mulf(x.clone()));
+            let (_, x) = Rational::from(&mu[k][i]).fract_round(Integer::new());
+            basis[k] = basis[k].sub(&basis[i].mulf(&x));
 
             // Updating Gram matrix
             for j in 0..d {

@@ -81,12 +81,12 @@ impl RationalVector {
     }
 
     /// Multiplication by a scalar
-    pub fn mulf(&self, other: Rational) -> Self {
+    pub fn mulf(&self, other: &Rational) -> Self {
         let n = self.dimension();
 
         Self::from_vector(
             (0..n)
-                .map(|i| Rational::from(&self.coefficients[i] * &other))
+                .map(|i| Rational::from(&self.coefficients[i] * other))
                 .collect(),
         )
     }
