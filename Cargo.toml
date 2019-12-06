@@ -3,12 +3,23 @@ name = "lll-rs"
 version = "0.1.0"
 authors = ["Rémi Géraud-Stewart <remi.geraud@ens.fr>", "Stanislas Plessia <stplessia@gmail.com>, Edmond de Roffignac <edmond.de-roffignac@student.ecp.fr>"]
 edition = "2018"
+description = "Implementation of the LLL algorithm for lattice reduction and it's improved version L²"
+license = "MIT"
+readme = "README.md"
+keywords = ["lll", "lattice", "algebra"]
+categories = ["cryptography", "science"]
+repository = "https://github.com/rust-crypto-labs/lll-rs"
 
 [dependencies]
 rug = "1.*"
 
 [dev-dependencies]
 criterion = "0.2"
+
+[profile.release]
+opt-level = 3
+debug = false
+lto = true
 
 [[bench]]
 name = "benchmark"
