@@ -5,9 +5,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-/**
- * Implementation of vectors with floating-point (IEEE 754) coefficients
- */
+/// Implementation of vectors with floating-point (IEEE 754) coefficients
 #[derive(Clone)]
 pub struct VectorF {
     /// Underlying representation of the vector as a list of coefficients
@@ -18,10 +16,6 @@ pub struct VectorF {
 }
 
 impl Vector for VectorF {
-    /**
-     * Return a basis vector for the vector space
-     *  `position`: number of the basis vector (0..n)
-     */
     fn basis_vector(&self, position: usize) -> Self {
         assert!(position < self.dimension());
 
@@ -34,9 +28,6 @@ impl Vector for VectorF {
         }
     }
 
-    /**
-     * Create a new `VectorF` with default values, of size `dimension`
-     */
     fn init(dimension: usize) -> Self {
         Self {
             coefficients: vec![Default::default(); dimension],
@@ -44,16 +35,10 @@ impl Vector for VectorF {
         }
     }
 
-    /**
-     * Return the vector's dimension
-     */
     fn dimension(&self) -> usize {
         self.dimension
     }
 
-    /**
-     * Add two vectors of the same size
-     */
     fn add(&self, other: &Self) -> Self {
         let n = self.dimension();
 
@@ -66,9 +51,6 @@ impl Vector for VectorF {
         )
     }
 
-    /**
-     * Subtract the vector `other` from this vector
-     */
     fn sub(&self, other: &Self) -> Self {
         let n = self.dimension();
 
@@ -83,9 +65,6 @@ impl Vector for VectorF {
 }
 
 impl Dot<f64> for VectorF {
-    /**
-     * Dot product between two vectors
-     */
     fn dot(&self, other: &Self) -> f64 {
         let n = self.dimension();
         assert_eq!(n, other.dimension());
@@ -97,9 +76,7 @@ impl Dot<f64> for VectorF {
 }
 
 impl VectorF {
-    /**
-     * Create an instance from a `Vec` of floating-point coordinates
-     */
+    /// Create an instance from a `Vec` of floating-point coordinates
     pub fn from_vector(coefficients: Vec<f64>) -> Self {
         Self {
             dimension: coefficients.len(),

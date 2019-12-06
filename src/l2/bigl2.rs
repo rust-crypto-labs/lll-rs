@@ -4,22 +4,23 @@ use crate::vector::{BigVector, Dot, RationalVector, Vector};
 
 use std::cmp::max;
 
-/**
- * Lattice reduction (L² algorithm)
- *
- * This implementation uses `BigVector` for the underlying arithmetic operations.
- *
- * Here `basis` is a generating matrix for the lattice. TODO: explain `eta` and `delta`
- *
- * The basis is reduced in-place.
- * 
- * # Panics
- * if delta <= 1/4 or delta >= 1  
- * if eta <= 1/2 or eta > sqrt(delta)
- */
+/// Lattice reduction (L² algorithm)
+///
+/// This implementation uses `BigVector` for the underlying arithmetic operations.
+///
+/// Arguments:
+///  * basis: A generating matrix for the lattice
+///  * eta: eta factor of the basis reduction
+///  * delta: delta factor of the basis reduction
+///
+/// The basis is reduced in-place.
+///
+/// # Panics
+/// if delta <= 1/4 or delta >= 1  
+/// if eta <= 1/2 or eta > sqrt(delta)
 pub fn lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
-    assert!(0.25<delta && delta<1.);
-    assert!(0.5<eta && eta*eta<delta);
+    assert!(0.25 < delta && delta < 1.);
+    assert!(0.5 < eta && eta * eta < delta);
     // Variables
     let (d, _) = basis.dimensions();
     let mut gram: Matrix<BigVector> = Matrix::init(d, d); // Gram matrix (upper triangular)
@@ -41,7 +42,15 @@ pub fn lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
     let mut k = 1;
 
     while k < d {
-        size_reduce(k, d, basis, &mut gram, &mut mu, &mut r, Rational::from(&eta_minus));
+        size_reduce(
+            k,
+            d,
+            basis,
+            &mut gram,
+            &mut mu,
+            &mut r,
+            Rational::from(&eta_minus),
+        );
 
         let delta_criterion = Rational::from(&delta_plus * &r[k - 1][k - 1]);
         let scalar_criterion = &r[k][k] + Rational::from(&mu[k][k - 1] * &r[k - 1][k - 1]);
@@ -79,19 +88,18 @@ pub fn lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
     }
 }
 
-/**
- * Performs the `eta`-size-reduction of `basis[k]`
- *
- *  * `k`: Index of the column to be `eta`-size-reduced
- *  * `d`:
- *  * `basis`: A generating
- *  * `gram`: Gram matrix of `basis`  
- *  * `mu`:
- *  * `r`:
- *  * `eta`:
- *
- * Note: both `basis` and `gram` are updated by this operation.
- */
+/// Performs the `eta`-size-reduction of `basis[k]`
+///
+/// Arguments:
+/// * `k`: Index of the column to be `eta`-size-reduced
+/// * `d`: The basis dimension
+/// * `basis`: A generating matrix for the lattice
+/// * `gram`: Gram matrix of `basis`  
+/// * `mu`: Gram coefficient matrix
+/// * `r`: the r_ij matrix
+/// * `eta`: eta factor of the basis reduction
+///
+/// Note: both `basis` and `gram` are updated by this operation.
 fn size_reduce(
     k: usize,
     d: usize,

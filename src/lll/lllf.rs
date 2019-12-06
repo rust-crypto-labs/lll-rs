@@ -1,16 +1,14 @@
 use crate::matrix::Matrix;
 use crate::vector::{Dot, Vector, VectorF};
 
-/**
- * Lattice reduction using the original Lenstra-Lenstra-Lovasz algorithm
- *
- * This function uses platform floating-point numbers (IEEE 754) for all
- * arithmetic operations. The value of `delta` is set to 0.75.
- *
- *   - `basis`: A generating matrix for the lattice
- *
- * The basis is reduced in-place.
- */
+/// Lattice reduction using the original Lenstra-Lenstra-Lovasz algorithm
+///
+/// This function uses platform floating-point numbers (IEEE 754) for all
+/// arithmetic operations. The value of `delta` is set to 0.75.
+///
+///   - `basis`: A generating matrix for the lattice
+///
+/// The basis is reduced in-place.
 pub fn lattice_reduce(basis: &mut Matrix<VectorF>) {
     // Parameter delta in the Lovasz condition
     let delta = 0.75;

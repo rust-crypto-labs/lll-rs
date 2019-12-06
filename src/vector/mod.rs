@@ -1,3 +1,5 @@
+//! Basic vector structures for LLL
+
 mod bigvector;
 mod rationalvector;
 mod vectorf;
@@ -6,9 +8,7 @@ pub use bigvector::BigVector;
 pub use rationalvector::RationalVector;
 pub use vectorf::VectorF;
 
-/**
- * The `Vector` trait describes the general properties of an element in a vector space.
- */
+/// The `Vector` trait describes the general properties of an element in a vector space.
 pub trait Vector {
     /// Returns the vector's dimension
     fn dimension(&self) -> usize;
@@ -26,7 +26,7 @@ pub trait Vector {
     fn basis_vector(&self, position: usize) -> Self;
 }
 
-/** The `Dot` trait allows the computation of dot products with values in `T` */
+/// The `Dot` trait allows the computation of dot products with values in `T`
 pub trait Dot<T> {
     fn dot(&self, other: &Self) -> T;
 }

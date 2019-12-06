@@ -2,16 +2,14 @@ use crate::matrix::Matrix;
 use crate::rug::{Integer, Rational};
 use crate::vector::{BigVector, Dot, Vector};
 
-/**
- * Lattice reduction using the original Lenstra-Lenstra-Lovasz algorithm
- *
- * This implementation uses large integers for arithmetic operations.
- * The value of `delta` is set to 0.75.
- *
- *   - `basis`: A generating matrix for the lattice
- *
- * The basis is reduced in-place.
- */
+/// Lattice reduction using the original Lenstra-Lenstra-Lovasz algorithm
+///
+/// This implementation uses large integers for arithmetic operations.
+/// The value of `delta` is set to 0.75.
+///
+///   - `basis`: A generating matrix for the lattice
+///
+/// The basis is reduced in-place.
 pub fn lattice_reduce(basis: &mut Matrix<BigVector>) {
     // Parameter delta in the Lovasz condition
     let delta = (3, 4);

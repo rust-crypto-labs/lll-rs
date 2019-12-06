@@ -1,3 +1,5 @@
+//! Basic matrix structure for LLL
+
 use crate::vector::Vector;
 
 use std::{
@@ -5,9 +7,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-/**
-* A `Matrix` is a collection of `Vector`s
-*/
+/// A `Matrix` is a collection of `Vector`s
 pub struct Matrix<T: Vector> {
     /// Internal representation as a list of elements of type `T`
     columns: Vec<T>,
@@ -20,11 +20,9 @@ impl<T: Vector> Matrix<T>
 where
     T: Clone,
 {
-    /**
-     * Initialise an empty `Matrix`
-     *      - `col_num`: number of columns
-     *      - `col_dim`: number of rows
-     */
+    /// Initialise an empty `Matrix`
+    ///      - `col_num`: number of columns
+    ///      - `col_dim`: number of rows
     pub fn init(col_num: usize, col_dim: usize) -> Self {
         Self {
             columns: vec![T::init(col_dim); col_num],
@@ -32,9 +30,7 @@ where
         }
     }
 
-    /**
-     * Return the matrix dimensions
-     */
+    /// Return the matrix dimensions
     pub fn dimensions(&self) -> (usize, usize) {
         self.dimensions
     }

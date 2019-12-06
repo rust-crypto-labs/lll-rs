@@ -7,10 +7,8 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-/**
- * Implementation of a vector with arbitrary-length rationals as
- * coefficients
- */
+/// Implementation of a vector with arbitrary-length rationals as
+/// coefficients
 #[derive(Clone)]
 pub struct RationalVector {
     /// Internal representation as a list of coefficients
@@ -70,9 +68,7 @@ impl Vector for RationalVector {
 }
 
 impl RationalVector {
-    /**
-     * Create an instance from a `Vec` of `Rational`
-     */
+    /// Create an instance from a `Vec` of `Rational`
     pub fn from_vector(coefficients: Vec<Rational>) -> Self {
         Self {
             dimension: coefficients.len(),

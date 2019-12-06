@@ -7,10 +7,8 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-/**
- * Implementation of vectors with arbitrary-length integers as underlying
- * coefficients
- */
+/// Implementation of vectors with arbitrary-length integers as underlying
+/// coefficients
 #[derive(Clone)]
 pub struct BigVector {
     /// Internal representation as a list of `Integer`s
@@ -70,9 +68,7 @@ impl Vector for BigVector {
 }
 
 impl BigVector {
-    /**
-     * Create an instance from a `Vec` of `Integer`s
-     */
+    /// Create an instance from a `Vec` of `Integer`s
     pub fn from_vector(coefficients: Vec<Integer>) -> Self {
         Self {
             dimension: coefficients.len(),
