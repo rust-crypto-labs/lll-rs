@@ -1,31 +1,47 @@
 # lll-rs
 
-`lll-rs` is an implementation of the Lenstra-Lenstra-Lovász lattice basis reduction algorithm (LLL [1]) in Rust as well as the implementation of an improved version, the L² algorithm (L² [2]). The library comes with a set of simple helpers to create vectors and matrices to perform lattice basis reduction.
+`lll-rs` is an implementation of the Lenstra–Lenstra–Lovász lattice basis reduction algorithm (LLL [[LLL82](#LLL82)], [1a], [1b]) in Rust.
 
-## Theory
+## Supported algorithms
 
-### Lattice
+- LLL reduction [1a]
+- L² reduction [2]
+- Standard Gram-Schmidt orthogonalisation
 
-A lattice Λ is a dicrete subgroup of a vector space E, as an example if E = ℝⁿ (Lattice [3])
+The library comes with a set of simple helpers to create vectors and matrices, with the following entries:
+
+- Integers (`BigVector`, relying on `rug::Integer`)
+- Rationals (`RationalVector`, relying on `rug::Rational`)
+- Small rationals (`VectorF`, relying on `f64`)
+
+`lll-rs` is far from feature-complete and should be considered experimental. Users willing to use a stable and battle-tested library should
+consider `fplll` instead [fplll].
+
+## Lattice reduction
+
+A lattice Λ is a dicrete subgroup of some vector space E. A typical example (see e.g. [3]) is E = ℝⁿ and
 
 `X ∊ Λ <=> X = l_1 * b_1 + ... + l_n * b_n  with (l_i) in ℤ and (b_i) in ℝ`
 
-[TODO]: Shortest vector
+Lattices are much studied mathematical structures on which we can formulate some useful problems [4]. Some of
+these problems are simpler to solve when a "good basis" is known for the lattice. Conversely it is
+difficult to solve them when only a "bad basis" is known.
 
-### LLL algorithm
+Simply put, the LLL algorithm provides such a "good basis"; it roughly does so by performing a (variant of) rounded Gram-Schimdt orthogonalization on the "bad basis". 
+Remarkably, this algorithm runs in polynomial time which makes it possible to solve several lattice problems efficiently.
 
-Simply put, the LLL algorithm tries to solve the shortest vector problem by performing a Gram-Schimdt orthogonalization but at each step floors the value found to keep it in ℤ.
-That way it can perform a base reduction algorithm in polynomial time
+Applications of LLL include:
 
-### Usage
-
-LLL can be used for many operations:
-
-- cracking RSA: The coppersmith attack (Coppersmith [4])
+- Cryptanalysis of lattice-based cryptosystems (e.g. NTRU)
+- Cryptanalysis of pseudo-random number generators (e.g. LCG and truncated LCG)
+- Cryptanalysis of RSA (e.g. Coppersmith's attack [5])
+- Cryptanalysis of knapsack-based cryptosystems
+- Finding mathematical counterexamples (e.g. Merten's conjecture)
 - Finding roots of polynomials with integer coefficients
-- [TODO]: more
+- Finding integer relations between constants
+- Decoding of error correcting codes 
 
-## The code
+## Example
 
 ```rust
 // Init the matrix with Integer
@@ -51,33 +67,30 @@ basis[2] = BigVector::from_vector(vec![
     Integer::from(154),
 ]);
 
-// Perfom the LLL basis redution
+// Perfom the LLL basis reduction
 biglll::lattice_reduce(&mut basis);
 
 // OR
-// Perfom the LLL basis redution
+// Perfom the L2 basis reduction
 // Specify the delta and eta coefficient for the reduction
 bigl2::lattice_reduce(&mut basis, 0.5005, 0.999);
 ```
 
-### Support
-
-`lll-rs` supports:
-
-- `rug::Integer` through `BigVector`
-- `rug::Rational` through `RationalVector`
-- `f64` through `VectorF` (simply performs a standard Gram-Schmidt orthogonalisation)
-
-### Example
-
 ## References and documentation
 
+<a name="LLL82">[LLL82]</a> A. K. Lenstra, H. W. Lenstra, Jr. and L. Lovasz. Factoring polynomials with rational coefficients. Math. Ann., 261: 515–534 (1982)
+
 - https://openaccess.leidenuniv.nl/bitstream/handle/1887/3810/346_050.pdf
+- https://en.wikipedia.org/wiki/Lenstra–Lenstra–Lovász_lattice_basis_reduction_algorithm
 - https://perso.ens-lyon.fr/damien.stehle/downloads/LLL25.pdf
 - https://en.wikipedia.org/wiki/Lattice_(group)
+- https://en.wikipedia.org/wiki/Lattice_problem
 - https://en.wikipedia.org/wiki/Coppersmith%27s_attack
 
-[1]: https://openaccess.leidenuniv.nl/bitstream/handle/1887/3810/346_050.pdf
+[1a]: https://openaccess.leidenuniv.nl/bitstream/handle/1887/3810/346_050.pdf
+[1b]: https://en.wikipedia.org/wikiLenstra–Lenstra–Lovász_lattice_basis_reduction_algorithm
 [2]: https://perso.ens-lyon.fr/damien.stehle/downloads/LLL25.pdf
 [3]: https://en.wikipedia.org/wiki/Lattice_(group)
-[4]: https://en.wikipedia.org/wiki/Coppersmith%27s_attack
+[4]: https://en.wikipedia.org/wiki/Lattice_problem
+[5]: https://en.wikipedia.org/wiki/Coppersmith%27s_attack
+[fplll]: https://github.com/fplll/fplll
