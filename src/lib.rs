@@ -57,7 +57,7 @@ mod test {
         vector::{BigVector, VectorF},
     };
 
-    use rug::Integer;
+    use rug::{Integer,Assign};
 
     #[test]
     fn test_lllf() {
@@ -143,5 +143,17 @@ mod test {
         // "Good" lattice basis
         bigl2::lattice_reduce(&mut basis, 0.5005, 0.999);
         println!("{:?}", basis);
+    }
+
+    #[test]
+    fn test_bigl2_2() {
+        let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
+        basis[0][0].assign(1);
+        basis[0][3].assign(1);
+        basis[1][1].assign(1);
+        basis[1][3].assign(5);
+        basis[2][2].assign(1);
+        basis[2][3].assign(9);
+        bigl2::lattice_reduce(&mut basis, 0.6, 0.999);
     }
 }
