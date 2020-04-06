@@ -1,6 +1,6 @@
 [package]
 name = "lll-rs"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Rémi Géraud-Stewart <remi.geraud@ens.fr>", "Stanislas Plessia <stplessia@gmail.com>", "Edmond de Roffignac <edmond.de-roffignac@student.ecp.fr>"]
 edition = "2018"
 description = "Implementation of the LLL algorithm for lattice reduction and it's improved version L²"
