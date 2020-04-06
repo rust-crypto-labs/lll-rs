@@ -163,6 +163,6 @@ mod test {
         basis[1][3].assign(5);
         basis[2][2].assign(1);
         basis[2][3].assign(9);
-        bigl2::lattice_reduce(&mut basis, 0.6, 0.999);
+        bigl2::lattice_reduce(&mut basis, 0.6, 0.95);
     }
 }
