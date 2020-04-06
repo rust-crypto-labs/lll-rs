@@ -53,7 +53,7 @@ pub fn lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
         );
 
         let delta_criterion = Rational::from(&delta_plus * &r[k - 1][k - 1]);
-        let scalar_criterion = &r[k][k] + Rational::from(&mu[k][k - 1] * &r[k - 1][k - 1]);
+        let scalar_criterion = &r[k][k] + Rational::from(&mu[k][k - 1]).square() * &r[k - 1][k - 1];
 
         // Lovazs condition
         if delta_criterion < scalar_criterion {
@@ -77,7 +77,7 @@ pub fn lattice_reduce(basis: &mut Matrix<BigVector>, eta: f64, delta: f64) {
                 for j in 0..=i {
                     r[i][j] = Rational::from(&gram[i][j])
                         - (0..j)
-                            .map(|index| Rational::from(&mu[j][index]).square() * &r[i][index])
+                            .map(|index| Rational::from(&mu[j][index] * &r[i][index]))
                             .sum::<Rational>();
                     mu[i][j] = Rational::from(&r[i][j] / &r[j][j]);
                 }
