@@ -19,7 +19,7 @@
 //! use rug::{Integer,Assign};
 //!
 //! // Init the matrix with Integer
-//! let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
+//! let mut basis: Matrix<Integer> = Matrix::init(3, 4);
 //!
 //! // Populate the matix
 //! basis[0] = BigVector::from_vector(vec![
@@ -56,6 +56,7 @@ pub mod l2;
 pub mod lll;
 pub mod matrix;
 pub mod vector;
+mod scalars;
 
 #[cfg(test)]
 mod test {
@@ -71,7 +72,7 @@ mod test {
     #[test]
     fn test_lllf() {
         // "Bad" lattice basis
-        let mut basis: Matrix<VectorF> = Matrix::init(3, 4);
+        let mut basis: Matrix<f64> = Matrix::init(3, 4);
         basis[0] = VectorF::from_vector(vec![1., 0., 0., 1345.]);
         basis[1] = VectorF::from_vector(vec![0., 1., 0., 35.]);
         basis[2] = VectorF::from_vector(vec![0., 0., 1., 154.]);
@@ -85,7 +86,7 @@ mod test {
     #[test]
     fn test_biglll() {
         // "Bad" lattice basis
-        let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
+        let mut basis: Matrix<rug::Integer> = Matrix::init(3, 4);
         basis[0] = BigVector::from_vector(vec![
             Integer::from(1) << 100000,
             Integer::from(0),
@@ -114,7 +115,7 @@ mod test {
     #[test]
     fn test_l2f() {
         // "Bad" lattice basis
-        let mut basis: Matrix<VectorF> = Matrix::init(3, 4);
+        let mut basis: Matrix<f64> = Matrix::init(3, 4);
         basis[0] = VectorF::from_vector(vec![1., 0., 0., 1345.]);
         basis[1] = VectorF::from_vector(vec![0., 1., 0., 35.]);
         basis[2] = VectorF::from_vector(vec![0., 0., 1., 154.]);
@@ -128,7 +129,7 @@ mod test {
     #[test]
     fn test_bigl2() {
         // "Bad" lattice basis
-        let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
+        let mut basis: Matrix<rug::Integer> = Matrix::init(3, 4);
         basis[0] = BigVector::from_vector(vec![
             Integer::from(1) << 100000,
             Integer::from(0),
@@ -156,7 +157,7 @@ mod test {
 
     #[test]
     fn test_bigl2_2() {
-        let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
+        let mut basis: Matrix<rug::Integer> = Matrix::init(3, 4);
         basis[0][0].assign(1);
         basis[0][3].assign(1);
         basis[1][1].assign(1);
