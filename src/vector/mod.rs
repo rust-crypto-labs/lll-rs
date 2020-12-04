@@ -8,15 +8,11 @@ pub type RationalVector = Vector<rug::Rational>;
 pub type VectorF = Vector<f64>;
 pub type BigVector = Vector<rug::Integer>;
 
-/// Implementation of a vector with arbitrary-length rationals as
-/// coefficients
+/// Implementation of a vector without generic coefficients
 #[derive(Clone)]
 pub struct Vector<T> {
     /// Internal representation as a list of coefficients
     coefficients: Vec<T>,
-
-    /// Dimension of the vector
-    dimension: usize,
 }
 
 pub trait VectorMember:
@@ -45,27 +41,31 @@ impl<T> Vector<T>
 where
     T: VectorMember,
 {
-    fn basis_vector(&self, position: usize) -> Self {
-        assert!(position < self.dimension);
+    #![allow(dead_code)]
+    fn basis_vector(dimension: usize, position: usize) -> Self {
+        assert!(position < dimension);
 
-        let mut coefficients = vec![T::from(0); self.dimension()];
-        coefficients[position] = T::from(1);
+        let coefficients = (0..dimension)
+            .map(|i| {
+                if i == position {
+                    T::from(1)
+                } else {
+                    T::from(0)
+                }
+            })
+            .collect();
 
-        Self {
-            coefficients,
-            dimension: self.dimension(),
+        Self { coefficients }
         }
-    }
 
     pub fn init(dimension: usize) -> Self {
         Self {
             coefficients: vec![Default::default(); dimension],
-            dimension,
         }
     }
 
     pub fn dimension(&self) -> usize {
-        self.dimension
+        self.coefficients.len()
     }
 
     pub fn add(&self, other: &Self) -> Self {
@@ -94,10 +94,7 @@ where
 
     /// Create an instance from a `Vec`
     pub fn from_vector(coefficients: Vec<T>) -> Self {
-        Self {
-            dimension: coefficients.len(),
-            coefficients,
-        }
+        Self { coefficients }
     }
 
     /// Multiplication by a scalar
