@@ -56,7 +56,7 @@ where
             .collect();
 
         Self { coefficients }
-        }
+    }
 
     pub fn init(dimension: usize) -> Self {
         Self {
@@ -107,13 +107,31 @@ where
                 .collect(),
         )
     }
+}
 
-    pub fn dot(&self, other: &Self) -> T {
-        let n = self.dimension();
-        assert_eq!(n, other.dimension());
+pub trait Dot {
+    type Output;
+    fn dot(&self, other: &Self) -> Self::Output;
+}
 
-        (0..n)
-            .map(|i| self.coefficients[i].clone() * &other.coefficients[i])
+impl Dot for BigVector {
+    type Output = rug::Integer;
+    fn dot(&self, other: &Self) -> Self::Output {
+        self.coefficients
+            .iter()
+            .zip(&other.coefficients)
+            .map(|(coeff_r, coeff_l)| coeff_r * coeff_l)
+            .sum()
+    }
+}
+
+impl Dot for VectorF {
+    type Output = f64;
+    fn dot(&self, other: &Self) -> Self::Output {
+        self.coefficients
+            .iter()
+            .zip(&other.coefficients)
+            .map(|(coeff_r, coeff_l)| coeff_r * coeff_l)
             .sum()
     }
 }

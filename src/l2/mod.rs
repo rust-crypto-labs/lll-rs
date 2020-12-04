@@ -1,6 +1,6 @@
 use crate::matrix::Matrix;
 use crate::scalars::Scalars;
-use crate::vector::VectorMember;
+use crate::vector::{Dot, Vector, VectorMember};
 
 use std::cmp::max;
 
@@ -23,6 +23,7 @@ where
     S: Scalars,
     S::Integer: VectorMember,
     S::Fraction: VectorMember,
+    Vector<S::Integer>: Dot<Output = S::Integer>,
 {
     assert!(0.25 < delta && delta < 1.);
     assert!(0.5 < eta && eta * eta < delta);
@@ -110,6 +111,7 @@ fn size_reduce<S>(
     S: Scalars,
     S::Integer: VectorMember,
     S::Fraction: VectorMember,
+    Vector<S::Integer>: Dot<Output = S::Integer>,
 {
     // Update mu and r
     for i in 0..=k {

@@ -2,7 +2,7 @@
 
 use crate::matrix::Matrix;
 use crate::scalars::Scalars;
-use crate::vector::VectorMember;
+use crate::vector::{Dot, Vector, VectorMember};
 
 /// Lattice reduction using the original Lenstra-Lenstra-Lovasz algorithm
 ///
@@ -16,6 +16,7 @@ pub(crate) fn lattice_reduce<S>(basis: &mut Matrix<S::Integer>)
 where
     S: Scalars,
     S::Integer: VectorMember,
+    Vector<S::Integer>: Dot<Output = S::Integer>,
 {
     // Parameter delta in the Lovasz condition
     let delta = (3, 4);
