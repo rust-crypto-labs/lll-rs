@@ -4,7 +4,6 @@ use std::{
     ops::{self, Index, IndexMut},
 };
 
-pub type RationalVector = Vector<rug::Rational>;
 pub type VectorF = Vector<f64>;
 pub type BigVector = Vector<rug::Integer>;
 
@@ -109,7 +108,7 @@ where
     }
 }
 
-pub trait Dot {
+pub(crate) trait Dot {
     type Output;
     fn dot(&self, other: &Self) -> Self::Output;
 }
