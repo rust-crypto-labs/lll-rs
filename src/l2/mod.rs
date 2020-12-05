@@ -1,5 +1,5 @@
 use crate::matrix::Matrix;
-use crate::scalars::Scalars;
+use crate::scalars::{Scalars, FromExt};
 use crate::vector::{Dot, Vector, VectorMember};
 
 use std::cmp::max;
@@ -40,19 +40,19 @@ where
         }
     }
 
-    let eta_minus = S::from_f64((eta + 0.5) / 2.).unwrap();
-    let delta_plus = S::from_f64((delta + 1.) / 2.).unwrap();
+    let eta_minus = S::Fraction::from_ext((eta + 0.5) / 2.);
+    let delta_plus = S::Fraction::from_ext((delta + 1.) / 2.);
 
-    r[0][0] = S::from_int(gram[0][0].clone());
+    r[0][0] = S::Fraction::from_ext(&gram[0][0]);
 
     let mut k = 1;
 
     while k < d {
-        size_reduce::<S>(k, d, basis, &mut gram, &mut mu, &mut r, eta_minus.clone());
+        size_reduce::<S>(k, d, basis, &mut gram, &mut mu, &mut r, &eta_minus);
 
         let delta_criterion = delta_plus.clone() * &r[k - 1][k - 1];
         let scalar_criterion =
-            r[k][k].clone() + &(mu[k][k - 1].clone() * &mu[k][k - 1] * &r[k - 1][k - 1]);
+            (mu[k][k - 1].clone() * &mu[k][k - 1] * &r[k - 1][k - 1]) + &r[k][k];
 
         // Lovazs condition
         if delta_criterion < scalar_criterion {
@@ -74,7 +74,7 @@ where
             // Updating mu and r
             for i in 0..=k {
                 for j in 0..=i {
-                    r[i][j] = S::from_int(gram[i][j].clone())
+                    r[i][j] = S::Fraction::from_ext(&gram[i][j])
                         - &(0..j)
                             .map(|index| mu[j][index].clone() * &r[i][index])
                             .sum::<S::Fraction>();
@@ -106,7 +106,7 @@ fn size_reduce<S>(
     gram: &mut Matrix<S::Integer>,
     mu: &mut Matrix<S::Fraction>,
     r: &mut Matrix<S::Fraction>,
-    eta: S::Fraction,
+    eta: &S::Fraction,
 ) where
     S: Scalars,
     S::Integer: VectorMember,
@@ -115,16 +115,16 @@ fn size_reduce<S>(
 {
     // Update mu and r
     for i in 0..=k {
-        r[k][i] = S::from_int(gram[k][i].clone())
+        r[k][i] = S::Fraction::from_ext(&gram[k][i])
             - &(0..i)
                 .map(|index| mu[i][index].clone() * &r[k][index])
                 .sum::<S::Fraction>();
         mu[k][i] = r[k][i].clone() / &r[i][i];
     }
 
-    if (0..k).any(|index| mu[k][index] > eta) {
+    if (0..k).any(|index| mu[k][index] > *eta) {
         for i in (0..k).rev() {
-            let x = S::round(mu[k][i].clone());
+            let x = S::round(&mu[k][i]);
             basis[k] = basis[k].sub(&basis[i].mulf(&x));
 
             // Updating Gram matrix
@@ -137,8 +137,8 @@ fn size_reduce<S>(
             }
 
             for j in 0..i {
-                let swap = S::from_int(x.clone()) * &mu[i][j];
-                mu[k][j] -= &swap;
+                let minus = S::Fraction::from_ext(&x) * &mu[i][j];
+                mu[k][j] -= &minus;
             }
         }
         size_reduce::<S>(k, d, basis, gram, mu, r, eta);
