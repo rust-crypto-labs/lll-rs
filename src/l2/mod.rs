@@ -1,6 +1,6 @@
 use crate::matrix::Matrix;
 use crate::scalars::{Scalars, FromExt};
-use crate::vector::{Dot, Vector, VectorMember};
+use crate::vector::{Dot, Vector, Coefficient};
 
 use std::cmp::max;
 
@@ -21,8 +21,8 @@ use std::cmp::max;
 pub(crate) fn lattice_reduce<S>(basis: &mut Matrix<S::Integer>, eta: f64, delta: f64)
 where
     S: Scalars,
-    S::Integer: VectorMember,
-    S::Fraction: VectorMember,
+    S::Integer: Coefficient,
+    S::Fraction: Coefficient,
     Vector<S::Integer>: Dot<Output = S::Integer>,
 {
     assert!(0.25 < delta && delta < 1.);
@@ -109,8 +109,8 @@ fn size_reduce<S>(
     eta: &S::Fraction,
 ) where
     S: Scalars,
-    S::Integer: VectorMember,
-    S::Fraction: VectorMember,
+    S::Integer: Coefficient,
+    S::Fraction: Coefficient,
     Vector<S::Integer>: Dot<Output = S::Integer>,
 {
     // Update mu and r

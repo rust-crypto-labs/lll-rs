@@ -14,7 +14,7 @@ pub struct Vector<T> {
     coefficients: Vec<T>,
 }
 
-pub trait VectorMember:
+pub trait Coefficient:
     From<u32>
     + Clone
     + Default
@@ -25,7 +25,7 @@ pub trait VectorMember:
 {
 }
 
-impl<T> VectorMember for T where
+impl<T> Coefficient for T where
     T: From<u32>
         + Clone
         + Default
@@ -38,7 +38,7 @@ impl<T> VectorMember for T where
 
 impl<T> Vector<T>
 where
-    T: VectorMember,
+    T: Coefficient,
 {
     #![allow(dead_code)]
     fn basis_vector(dimension: usize, position: usize) -> Self {

@@ -1,6 +1,6 @@
 //! Basic matrix structure for LLL
 
-use crate::vector::{Vector, VectorMember};
+use crate::vector::{Vector, Coefficient};
 
 use std::{
     fmt::{self, Debug},
@@ -18,7 +18,7 @@ pub struct Matrix<T> {
 
 impl<T> Matrix<T>
 where
-    T: VectorMember,
+    T: Coefficient,
 {
     /// Initialise an empty `Matrix`
     ///      - `col_num`: number of columns

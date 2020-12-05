@@ -2,7 +2,7 @@
 
 use crate::matrix::Matrix;
 use crate::scalars::{Scalars, FromExt};
-use crate::vector::{Dot, Vector, VectorMember};
+use crate::vector::{Dot, Vector, Coefficient};
 
 /// Lattice reduction using the original Lenstra-Lenstra-Lovasz algorithm
 ///
@@ -15,7 +15,7 @@ use crate::vector::{Dot, Vector, VectorMember};
 pub(crate) fn lattice_reduce<S>(basis: &mut Matrix<S::Integer>)
 where
     S: Scalars,
-    S::Integer: VectorMember,
+    S::Integer: Coefficient,
     Vector<S::Integer>: Dot<Output = S::Integer>,
 {
     // Parameter delta in the Lovasz condition
