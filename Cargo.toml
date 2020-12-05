@@ -21,6 +21,11 @@ opt-level = 3
 debug = false
 lto = true
 
+[profile.bench]
+opt-level = 3
+debug = false
+lto = true
+
 [[bench]]
 name = "benchmark"
 harness = false
