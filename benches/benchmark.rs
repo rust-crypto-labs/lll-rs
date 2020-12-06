@@ -12,7 +12,7 @@ mod benchmarks {
 
     pub fn bench_big_int_reduction_lll(c: &mut Criterion) {
         // "Bad" lattice basis
-        let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
+        let mut basis: Matrix<Integer> = Matrix::init(3, 4);
         basis[0] = BigVector::from_vector(vec![
             Integer::from(1) << 10000,
             Integer::from(0),
@@ -39,7 +39,7 @@ mod benchmarks {
 
     pub fn bench_big_int_reduction_l2(c: &mut Criterion) {
         // "Bad" lattice basis
-        let mut basis: Matrix<BigVector> = Matrix::init(3, 4);
+        let mut basis: Matrix<Integer> = Matrix::init(3, 4);
         basis[0] = BigVector::from_vector(vec![
             Integer::from(1) << 10000,
             Integer::from(0),

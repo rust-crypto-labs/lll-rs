@@ -1,6 +1,6 @@
 //! Basic matrix structure for LLL
 
-use crate::vector::Vector;
+use crate::vector::{Coefficient, Vector};
 
 use std::{
     fmt::{self, Debug},
@@ -8,25 +8,37 @@ use std::{
 };
 
 /// A `Matrix` is a collection of `Vector`s
-pub struct Matrix<T: Vector> {
+pub struct Matrix<T> {
     /// Internal representation as a list of elements of type `T`
-    columns: Vec<T>,
+    columns: Vec<Vector<T>>,
 
     /// Dimensions of the matrix
     dimensions: (usize, usize),
 }
 
-impl<T: Vector> Matrix<T>
+impl<T> Matrix<T>
 where
-    T: Clone,
+    T: Coefficient,
 {
     /// Initialise an empty `Matrix`
     ///      - `col_num`: number of columns
     ///      - `col_dim`: number of rows
     pub fn init(col_num: usize, col_dim: usize) -> Self {
         Self {
-            columns: vec![T::init(col_dim); col_num],
+            columns: vec![Vector::<T>::init(col_dim); col_num],
             dimensions: (col_num, col_dim),
+        }
+    }
+
+    pub fn from_columns(columns: Vec<Vector<T>>) -> Self {
+        let dimensions = if let Some(col) = columns.first() {
+            (columns.len(), col.dimension())
+        } else {
+            (0, 0)
+        };
+        Self {
+            columns,
+            dimensions,
         }
     }
 
@@ -42,30 +54,24 @@ where
 }
 
 /// Direct access to a column
-impl<T> Index<usize> for Matrix<T>
-where
-    T: Vector,
-{
-    type Output = T;
+impl<T> Index<usize> for Matrix<T> {
+    type Output = Vector<T>;
 
-    fn index(&self, index: usize) -> &T {
+    fn index(&self, index: usize) -> &Self::Output {
         &self.columns[index]
     }
 }
 
 /// Direct access to a column (mutable)
-impl<T> IndexMut<usize> for Matrix<T>
-where
-    T: Vector,
-{
-    fn index_mut(&mut self, index: usize) -> &mut T {
+impl<T> IndexMut<usize> for Matrix<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.columns[index]
     }
 }
 
 impl<T> fmt::Debug for Matrix<T>
 where
-    T: Vector + Debug,
+    T: Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "{:?}\n", self.columns)
