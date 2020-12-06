@@ -122,7 +122,7 @@ fn size_reduce<S>(
         mu[k][i] = r[k][i].clone() / &r[i][i];
     }
 
-    if (0..k).any(|index| mu[k][index] > *eta) {
+    if (0..k).any(|index| S::abs(mu[k][index].clone()) > *eta) {
         for i in (0..k).rev() {
             let x = S::round(&mu[k][i]);
             basis[k] = basis[k].sub(&basis[i].mulf(&x));

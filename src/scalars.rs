@@ -29,6 +29,7 @@ pub(crate) trait Scalars {
 
     fn round(n: &Self::Fraction) -> Self::Integer;
     fn round_div(n: Self::Integer, d: Self::Integer) -> Self::Integer;
+    fn abs(f: Self::Fraction) -> Self::Fraction;
 }
 
 impl_from_ext!(&f64, f64, |f: &f64| *f);
@@ -47,6 +48,10 @@ impl Scalars for Float {
 
     fn round_div(n: Self::Integer, d: Self::Integer) -> Self::Integer {
         (n / d).round()
+    }
+
+    fn abs(f: Self::Fraction) -> Self::Fraction {
+        f.abs()
     }
 }
 
@@ -69,5 +74,9 @@ impl Scalars for BigNum {
     fn round_div(mut n: Self::Integer, mut d: Self::Integer) -> Self::Integer {
         n.div_rem_round_mut(&mut d);
         n
+    }
+
+    fn abs(f: Self::Fraction) -> Self::Fraction {
+       f.abs()
     }
 }

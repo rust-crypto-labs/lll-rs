@@ -1,6 +1,6 @@
 //! Basic matrix structure for LLL
 
-use crate::vector::{Vector, Coefficient};
+use crate::vector::{Coefficient, Vector};
 
 use std::{
     fmt::{self, Debug},
@@ -30,6 +30,18 @@ where
         }
     }
 
+    pub fn from_columns(columns: Vec<Vector<T>>) -> Self {
+        let dimensions = if let Some(col) = columns.first() {
+            (columns.len(), col.dimension())
+        } else {
+            (0, 0)
+        };
+        Self {
+            columns,
+            dimensions,
+        }
+    }
+
     /// Return the matrix dimensions
     pub fn dimensions(&self) -> (usize, usize) {
         self.dimensions
@@ -42,8 +54,7 @@ where
 }
 
 /// Direct access to a column
-impl<T> Index<usize> for Matrix<T>
-{
+impl<T> Index<usize> for Matrix<T> {
     type Output = Vector<T>;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -52,9 +63,7 @@ impl<T> Index<usize> for Matrix<T>
 }
 
 /// Direct access to a column (mutable)
-impl<T> IndexMut<usize> for Matrix<T>
-where
-{
+impl<T> IndexMut<usize> for Matrix<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.columns[index]
     }
