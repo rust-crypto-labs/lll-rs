@@ -1,8 +1,8 @@
 //! The Lenstra-Lenstra-Lovasz algorithm [LLL82]
 
 use crate::matrix::Matrix;
-use crate::scalars::{Scalars, FromExt};
-use crate::vector::{Dot, Vector, Coefficient};
+use crate::scalars::{FromExt, Scalars};
+use crate::vector::{Coefficient, Dot, Vector};
 
 /// Lattice reduction using the original Lenstra-Lenstra-Lovasz algorithm
 ///

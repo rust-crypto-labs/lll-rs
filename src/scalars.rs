@@ -77,6 +77,6 @@ impl Scalars for BigNum {
     }
 
     fn abs(f: Self::Fraction) -> Self::Fraction {
-       f.abs()
+        f.abs()
     }
 }

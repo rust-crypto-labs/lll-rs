@@ -62,7 +62,7 @@ impl<T: Coefficient> Matrix<T> {
     /// Insert the i-th column before the j-th one
     pub fn insert(&mut self, i: usize, j: usize) {
         let v = self.columns.remove(i);
-        self.columns.insert(i, v)
+        self.columns.insert(j, v)
     }
 }
 

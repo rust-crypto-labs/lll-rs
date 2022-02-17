@@ -1,6 +1,6 @@
 //! Basic vector structures for LLL
 use std::{
-    fmt::{self, Debug},
+    fmt::Debug,
     ops::{self, Index, IndexMut},
 };
 
@@ -144,7 +144,7 @@ impl Dot for VectorF {
     }
 }
 
-impl<T: Coefficinet> Index<usize> for Vector<T> {
+impl<T: Coefficient> Index<usize> for Vector<T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &T {
@@ -152,14 +152,8 @@ impl<T: Coefficinet> Index<usize> for Vector<T> {
     }
 }
 
-impl<T: Coefficinet> IndexMut<usize> for Vector<T> {
+impl<T: Coefficient> IndexMut<usize> for Vector<T> {
     fn index_mut(&mut self, index: usize) -> &mut T {
         &mut self.coefficients[index]
-    }
-}
-
-impl<T: Debug + Coefficient> Debug for Vector<T> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self.coefficients)
     }
 }
