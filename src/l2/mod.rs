@@ -1,8 +1,8 @@
 use crate::matrix::Matrix;
-use crate::scalars::{Scalars, FromExt};
-use crate::vector::{Dot, Vector, Coefficient};
+use crate::scalars::{FromExt, Scalars};
+use crate::vector::{Coefficient, Dot, Vector};
 
-use std::cmp::max;
+use std::ops::Mul;
 
 /// Lattice reduction (L² algorithm)
 ///
@@ -27,11 +27,16 @@ where
 {
     assert!(0.25 < delta && delta < 1.);
     assert!(0.5 < eta && eta * eta < delta);
+
     // Variables
     let (d, _) = basis.dimensions();
     let mut gram: Matrix<S::Integer> = Matrix::init(d, d); // Gram matrix (upper triangular)
     let mut r: Matrix<S::Fraction> = Matrix::init(d, d); // r_ij matrix
     let mut mu: Matrix<S::Fraction> = Matrix::init(d, d); // Gram coefficient matrix
+    let mut s: Vector<S::Fraction> = Vector::init(d);
+
+    let zero = S::Fraction::from(0);
+    let mut zeros = 0;
 
     // Computing Gram matrix
     for i in 0..d {
@@ -41,49 +46,57 @@ where
     }
 
     let eta_minus = S::Fraction::from_ext((eta + 0.5) / 2.);
-    let delta_plus = S::Fraction::from_ext((delta + 1.) / 2.);
+    let delta_plus = S::Fraction::from_ext(0.99); //(delta + 1.) / 2.);
 
     r[0][0] = S::Fraction::from_ext(&gram[0][0]);
 
-    let mut k = 1;
+    let mut kappa = 1;
 
-    while k < d {
-        size_reduce::<S>(k, d, basis, &mut gram, &mut mu, &mut r, &eta_minus);
+    while kappa < (d - zeros) {
+        size_reduce::<S>(basis, &mut gram, &mut mu, &mut r, kappa, &eta_minus);
 
-        let delta_criterion = delta_plus.clone() * &r[k - 1][k - 1];
-        let scalar_criterion =
-            (mu[k][k - 1].clone() * &mu[k][k - 1] * &r[k - 1][k - 1]) + &r[k][k];
-
-        // Lovazs condition
-        if delta_criterion < scalar_criterion {
-            k += 1;
-        } else {
-            basis.swap(k, k - 1);
-
-            // Updating Gram matrix
-            for j in 0..d {
-                if j < k {
-                    gram[k][j] = basis[k].dot(&basis[j]);
-                    gram[k - 1][j] = basis[k - 1].dot(&basis[j]);
-                } else {
-                    gram[j][k] = basis[k].dot(&basis[j]);
-                    gram[j][k - 1] = basis[k - 1].dot(&basis[j]);
-                }
-            }
-
-            // Updating mu and r
-            for i in 0..=k {
-                for j in 0..=i {
-                    r[i][j] = S::Fraction::from_ext(&gram[i][j])
-                        - &(0..j)
-                            .map(|index| mu[j][index].clone() * &r[i][index])
-                            .sum::<S::Fraction>();
-                    mu[i][j] = r[i][j].clone() / &r[j][j];
-                }
-            }
-
-            k = max(1, k - 1);
+        s[0] = S::Fraction::from_ext((gram[kappa][kappa].clone(), S::Integer::from(1)));
+        for i in 0..kappa {
+            s[i + 1] = s[i].clone() - &mu[kappa][i].clone().mul(&r[kappa][i]);
         }
+
+        let delta_criterion = delta_plus.clone() * &r[kappa - 1][kappa - 1];
+
+        if delta_criterion > s[kappa - 1] {
+            let kappa_prime = kappa;
+            while kappa >= 1 && delta_criterion >= s[kappa - 1] {
+                kappa -= 1;
+            }
+
+            let is_neg = s[kappa] <= zero;
+
+            let k = if !is_neg {
+                kappa
+            } else {
+                zeros += 1;
+                d - zeros
+            };
+
+            if k != kappa_prime {
+                basis.insert(kappa_prime, k);
+                mu.insert(kappa_prime, k);
+                r.insert(kappa_prime, k)
+            }
+
+            // Update Gram matrix
+            for i in 0..d {
+                for j in 0..=i {
+                    gram[i][j] = basis[i].dot(&basis[j]);
+                }
+            }
+
+            if is_neg {
+                kappa = kappa_prime;
+                continue;
+            }
+        }
+        r[kappa][kappa] = s[kappa].clone();
+        kappa += 1;
     }
 }
 
@@ -100,12 +113,11 @@ where
 ///
 /// Note: both `basis` and `gram` are updated by this operation.
 fn size_reduce<S>(
-    k: usize,
-    d: usize,
     basis: &mut Matrix<S::Integer>,
     gram: &mut Matrix<S::Integer>,
     mu: &mut Matrix<S::Fraction>,
     r: &mut Matrix<S::Fraction>,
+    kappa: usize,
     eta: &S::Fraction,
 ) where
     S: Scalars,
@@ -113,35 +125,81 @@ fn size_reduce<S>(
     S::Fraction: Coefficient,
     Vector<S::Integer>: Dot<Output = S::Integer>,
 {
-    // Update mu and r
-    for i in 0..=k {
-        r[k][i] = S::Fraction::from_ext(&gram[k][i])
-            - &(0..i)
-                .map(|index| mu[i][index].clone() * &r[k][index])
-                .sum::<S::Fraction>();
-        mu[k][i] = r[k][i].clone() / &r[i][i];
-    }
+    let zero = S::Integer::from(0);
+    let one = S::Integer::from(1);
 
-    if (0..k).any(|index| S::abs(mu[k][index].clone()) > *eta) {
-        for i in (0..k).rev() {
-            let x = S::round(&mu[k][i]);
-            basis[k] = basis[k].sub(&basis[i].mulf(&x));
+    loop {
+        cfa::<S>(kappa, basis, gram, mu, r);
 
-            // Updating Gram matrix
-            for j in 0..d {
-                if j < k {
-                    gram[k][j] = basis[k].dot(&basis[j]);
-                } else {
-                    gram[j][k] = basis[k].dot(&basis[j]);
+        let all_zeroes = (0..kappa)
+            .rev()
+            .all(|i| &S::abs(mu[kappa][i].clone()) < eta);
+
+        if all_zeroes {
+            break;
+        }
+
+        let mut m = mu[kappa].clone();
+
+        for i in (0..kappa).rev() {
+            let x_i = &S::round(&m[i]);
+            if x_i != &zero {
+                for j in 0..i {
+                    m[j] -= &mu[i][j]
+                        .clone()
+                        .mul(&S::Fraction::from_ext((x_i.clone(), one.clone())));
                 }
-            }
 
-            for j in 0..i {
-                let minus = S::Fraction::from_ext(&x) * &mu[i][j];
-                mu[k][j] -= &minus;
+                //  Swap basis
+                basis[kappa] = basis[kappa].sub(&basis[i].mulf(x_i));
             }
         }
-        size_reduce::<S>(k, d, basis, gram, mu, r, eta);
+
+        // Update Gram matrix
+
+        for j in 0..=kappa {
+            gram[kappa][j] = basis[kappa].dot(&basis[j]);
+        }
+    }
+}
+
+fn cfa<S>(
+    i: usize,
+    basis: &mut Matrix<S::Integer>,
+    gram: &mut Matrix<S::Integer>,
+    mu: &mut Matrix<S::Fraction>,
+    r: &mut Matrix<S::Fraction>,
+) where
+    S: Scalars,
+    S::Integer: Coefficient,
+    S::Fraction: Coefficient,
+    Vector<S::Integer>: Dot<Output = S::Integer>,
+{
+    for j in 0..=i {
+        gram[i][j] = basis[i].dot(&basis[j]);
+    }
+
+    for j in 0..i {
+        r[i][j] = S::Fraction::from_ext((gram[i][j].clone(), S::Integer::from(1)));
+
+        for k in 0..j {
+            r[i][j] = r[i][j].clone() - &r[i][k].clone().mul(&mu[j][k]);
+        }
+        mu[i][j] = r[i][j].clone() / &r[j][j];
+    }
+}
+
+/// Puts the trailing null columns at the beginning of the matrix
+fn zeros_first<S>(basis: &mut Matrix<S::Integer>)
+where
+    S: Scalars,
+    S::Integer: Coefficient,
+    S::Fraction: Coefficient,
+    Vector<S::Integer>: Dot<Output = S::Integer>,
+{
+    let (d, _) = basis.dimensions();
+    while basis[d - 1].is_zero() {
+        basis.insert(d - 1, 0)
     }
 }
 
@@ -158,13 +216,16 @@ pub mod bigl2 {
     ///  * eta: eta factor of the basis reduction
     ///  * delta: delta factor of the basis reduction
     ///
-    /// The basis is reduced in-place.
+    /// The basis is reduced in-place. The reduction is performed according to the standard pipeline of the fplll implementation of LLL.
+    /// It is done by doing one extra LLL-reduction at the end and putting all the trailing null rows at the beginning
     ///
     /// # Panics
     /// if delta <= 1/4 or delta >= 1  
     /// if eta <= 1/2 or eta > sqrt(delta)
     pub fn lattice_reduce(basis: &mut Matrix<rug::Integer>, eta: f64, delta: f64) {
-        super::lattice_reduce::<BigNum>(basis, eta, delta)
+        super::lattice_reduce::<BigNum>(basis, eta, delta);
+        super::lattice_reduce::<BigNum>(basis, eta, delta);
+        super::zeros_first::<BigNum>(basis);
     }
 }
 
@@ -182,12 +243,15 @@ pub mod l2f {
     ///  * eta: eta factor of the basis reduction
     ///  * delta: delta factor of the basis reduction
     ///
-    /// The basis is reduced in-place.
+    /// The basis is reduced in-place. The reduction is performed according to the standard pipeline of the fplll implementation of LLL.
+    /// It is done by doing one extra LLL-reduction at the end and putting all the trailing null rows at the beginning
     ///
     /// # Panics
     /// if delta <= 1/4 or delta >= 1  
     /// if eta <= 1/2 or eta > sqrt(delta)
     pub fn lattice_reduce(basis: &mut Matrix<f64>, eta: f64, delta: f64) {
-        super::lattice_reduce::<Float>(basis, eta, delta)
+        super::lattice_reduce::<Float>(basis, eta, delta);
+        super::lattice_reduce::<Float>(basis, eta, delta);
+        super::zeros_first::<Float>(basis);
     }
 }
