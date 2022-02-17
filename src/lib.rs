@@ -55,8 +55,8 @@ extern crate rug;
 pub mod l2;
 pub mod lll;
 pub mod matrix;
-pub mod vector;
 mod scalars;
+pub mod vector;
 
 #[cfg(test)]
 mod test {
@@ -64,182 +64,88 @@ mod test {
         l2::{bigl2, l2f},
         lll::{biglll, lllf},
         matrix::Matrix,
-        vector::{BigVector, VectorF},
     };
 
-    use rug::{Assign, Integer};
+    use rug::Integer;
 
     #[test]
     fn test_lllf() {
-        let dims = (3, 4);
         // "Bad" lattice basis
-        let mut basis: Matrix<f64> = Matrix::init(3, 4);
-        basis[0] = VectorF::from_vector(vec![1., 0., 0., 1345.]);
-        basis[1] = VectorF::from_vector(vec![0., 1., 0., 35.]);
-        basis[2] = VectorF::from_vector(vec![0., 0., 1., 154.]);
-        println!("{:?}", basis);
+        let mut basis: Matrix<f64> = Matrix::from_matrix(vec![
+            vec![1., 0., 0., 1345.],
+            vec![0., 1., 0., 35.],
+            vec![0., 0., 1., 154.],
+        ]);
 
         // "Good" lattice basis
         lllf::lattice_reduce(&mut basis);
-        println!("{:?}", basis);
 
-        let result = Matrix::<_>::from_columns(vec![
-            VectorF::from_vector(vec![0.0, -4.0, 1.0, 14.0]),
-            VectorF::from_vector(vec![0.0, 1.0, 0.0, 35.0]),
-            VectorF::from_vector(vec![1.0, 348.0, -88.0, -27.0]),
+        let result: Matrix<f64> = Matrix::from_matrix(vec![
+            vec![0.0, -4.0, 1.0, 14.0],
+            vec![0.0, 1.0, 0.0, 35.0],
+            vec![1.0, 348.0, -88.0, -27.0],
         ]);
-        for i in 0..dims.0 {
-            for j in 0..dims.1 {
-                assert_eq!(basis[i][j], result[i][j]);
-            }
-        }
+
+        assert_eq!(basis, result);
     }
 
     #[test]
     fn test_biglll() {
-        // "Bad" lattice basis
-        let mut basis: Matrix<rug::Integer> = Matrix::init(3, 4);
-        basis[0] = BigVector::from_vector(vec![
-            Integer::from(1) << 100000,
-            Integer::from(0),
-            Integer::from(0),
-            Integer::from(1345),
-        ]);
-        basis[1] = BigVector::from_vector(vec![
-            Integer::from(0),
-            Integer::from(1),
-            Integer::from(0),
-            Integer::from(35),
-        ]);
-        basis[2] = BigVector::from_vector(vec![
-            Integer::from(0),
-            Integer::from(0),
-            Integer::from(1),
-            Integer::from(154),
-        ]);
-        println!("{:?}", basis);
-
-        // "Good" lattice basis
-        biglll::lattice_reduce(&mut basis);
-        println!("{:?}", basis);
-    }
-
-    #[test]
-    fn test_biglll_2() {
         type I = Integer;
-        let dims = (3, 4);
-
         // "Bad" lattice basis
-        let mut basis: Matrix<I> = Matrix::init(3, 4);
-        basis[0] = BigVector::from_vector(vec![I::from(1), I::from(0), I::from(0), I::from(1345)]);
-        basis[1] = BigVector::from_vector(vec![I::from(0), I::from(1), I::from(0), I::from(35)]);
-        basis[2] = BigVector::from_vector(vec![I::from(0), I::from(0), I::from(1), I::from(154)]);
+        let mut basis: Matrix<I> = Matrix::from_matrix(vec![
+            vec![I::from(1) << 100000, I::from(0), I::from(0), I::from(1345)],
+            vec![I::from(0), I::from(1), I::from(0), I::from(35)],
+            vec![I::from(0), I::from(0), I::from(1), I::from(154)],
+        ]);
         println!("{:?}", basis);
 
         // "Good" lattice basis
         biglll::lattice_reduce(&mut basis);
-
-        let result: Matrix<I> = Matrix::from_columns(vec![
-            BigVector::from_vector(vec![I::from(0), I::from(-4), I::from(1), I::from(14)]),
-            BigVector::from_vector(vec![I::from(0), I::from(1), I::from(0), I::from(35)]),
-            BigVector::from_vector(vec![I::from(1), I::from(348), I::from(-88), I::from(-27)]),
-        ]);
-        for i in 0..dims.0 {
-            for j in 0..dims.1 {
-                assert_eq!(basis[i][j], result[i][j]);
-            }
-        }
+        println!("{:?}", basis);
     }
 
     #[test]
     fn test_l2f() {
-        let dims = (3, 4);
         // "Bad" lattice basis
-        let mut basis: Matrix<f64> = Matrix::init(dims.0, dims.1);
-        basis[0] = VectorF::from_vector(vec![1., 0., 0., 1345.]);
-        basis[1] = VectorF::from_vector(vec![0., 1., 0., 35.]);
-        basis[2] = VectorF::from_vector(vec![0., 0., 1., 154.]);
+        let mut basis: Matrix<f64> = Matrix::from_matrix(vec![
+            vec![1., 0., 0., 1345.],
+            vec![0., 1., 0., 35.],
+            vec![0., 0., 1., 154.],
+        ]);
         println!("{:?}", basis);
 
         // "Good" lattice basis
         l2f::lattice_reduce(&mut basis, 0.501, 0.998);
         println!("{:?}", basis);
 
-        let result = Matrix::<_>::from_columns(vec![
-            VectorF::from_vector(vec![1.0, 1.0, -9.0, -6.0]),
-            VectorF::from_vector(vec![0.0, 9.0, -2.0, 7.0]),
-            VectorF::from_vector(vec![1.0, -3.0, -8.0, 8.0]),
+        let result: Matrix<f64> = Matrix::from_matrix(vec![
+            vec![1.0, 1.0, -9.0, -6.0],
+            vec![0.0, 9.0, -2.0, 7.0],
+            vec![1.0, -3.0, -8.0, 8.0],
         ]);
-        for i in 0..dims.0 {
-            for j in 0..dims.1 {
-                assert_eq!(basis[i][j], result[i][j]);
-            }
-        }
+
+        assert_eq!(basis, result);
     }
 
     #[test]
     fn test_bigl2() {
-        // "Bad" lattice basis
-        let mut basis: Matrix<rug::Integer> = Matrix::init(3, 4);
-        basis[0] = BigVector::from_vector(vec![
-            Integer::from(1) << 100000,
-            Integer::from(0),
-            Integer::from(0),
-            Integer::from(1345),
-        ]);
-        basis[1] = BigVector::from_vector(vec![
-            Integer::from(0),
-            Integer::from(1),
-            Integer::from(0),
-            Integer::from(35),
-        ]);
-        basis[2] = BigVector::from_vector(vec![
-            Integer::from(0),
-            Integer::from(0),
-            Integer::from(1),
-            Integer::from(154),
-        ]);
-        println!("{:?}", basis);
-
-        // "Good" lattice basis
-        bigl2::lattice_reduce(&mut basis, 0.5005, 0.999);
-        println!("{:?}", basis);
-    }
-
-    #[test]
-    fn test_bigl2_2() {
-        let mut basis: Matrix<rug::Integer> = Matrix::init(3, 4);
-        basis[0][0].assign(1);
-        basis[0][3].assign(1);
-        basis[1][1].assign(1);
-        basis[1][3].assign(5);
-        basis[2][2].assign(1);
-        basis[2][3].assign(9);
-        bigl2::lattice_reduce(&mut basis, 0.6, 0.95);
-    }
-
-    #[test]
-    fn test_bigl2_3() {
         type I = Integer;
-        let dims = (3, 4);
-        // "Bad" lattice basis
-        let mut basis: Matrix<I> = Matrix::init(dims.0, dims.1);
-        basis[0] = BigVector::from_vector(vec![I::from(1), I::from(0), I::from(0), I::from(1345)]);
-        basis[1] = BigVector::from_vector(vec![I::from(0), I::from(1), I::from(0), I::from(35)]);
-        basis[2] = BigVector::from_vector(vec![I::from(0), I::from(0), I::from(1), I::from(154)]);
-
-        // "Good" lattice basis
-        bigl2::lattice_reduce(&mut basis, 0.501, 0.998);
-
-        let result = Matrix::<_>::from_columns(vec![
-            BigVector::from_vector(vec![I::from(1), I::from(1), I::from(-9), I::from(-6)]),
-            BigVector::from_vector(vec![I::from(0), I::from(9), I::from(-2), I::from(7)]),
-            BigVector::from_vector(vec![I::from(1), I::from(-3), I::from(-8), I::from(8)]),
+        let mut basis: Matrix<I> = Matrix::from_matrix(vec![
+            vec![I::from(1), I::from(2), I::from(3)],
+            vec![I::from(4), I::from(5), I::from(6)],
+            vec![I::from(7), I::from(8), I::from(9)],
         ]);
-        for i in 0..dims.0 {
-            for j in 0..dims.1 {
-                assert_eq!(basis[i][j], result[i][j]);
-            }
-        }
+        println!("{:?}", basis);
+
+        bigl2::lattice_reduce(&mut basis, 0.6, 0.95);
+        println!("{:?}", basis);
+
+        let result: Matrix<I> = Matrix::from_matrix(vec![
+            vec![I::from(0), I::from(0), I::from(0)],
+            vec![I::from(2), I::from(1), I::from(0)],
+            vec![I::from(-1), I::from(1), I::from(3)],
+        ]);
+        assert_eq!(basis, result);
     }
 }

@@ -7,8 +7,9 @@ use std::{
     ops::{Index, IndexMut},
 };
 
+#[derive(PartialEq)]
 /// A `Matrix` is a collection of `Vector`s
-pub struct Matrix<T> {
+pub struct Matrix<T: Coefficient> {
     /// Internal representation as a list of elements of type `T`
     columns: Vec<Vector<T>>,
 
@@ -16,10 +17,7 @@ pub struct Matrix<T> {
     dimensions: (usize, usize),
 }
 
-impl<T> Matrix<T>
-where
-    T: Coefficient,
-{
+impl<T: Coefficient> Matrix<T> {
     /// Initialise an empty `Matrix`
     ///      - `col_num`: number of columns
     ///      - `col_dim`: number of rows
@@ -42,6 +40,15 @@ where
         }
     }
 
+    pub fn from_matrix(matrix: Vec<Vec<T>>) -> Self {
+        Self::from_columns(
+            matrix
+                .iter()
+                .map(|column| Vector::<T>::from_vector(column.to_vec()))
+                .collect(),
+        )
+    }
+
     /// Return the matrix dimensions
     pub fn dimensions(&self) -> (usize, usize) {
         self.dimensions
@@ -51,10 +58,16 @@ where
     pub fn swap(&mut self, i: usize, j: usize) {
         self.columns.swap(i, j);
     }
+
+    /// Insert the i-th column before the j-th one
+    pub fn insert(&mut self, i: usize, j: usize) {
+        let v = self.columns.remove(i);
+        self.columns.insert(j, v)
+    }
 }
 
 /// Direct access to a column
-impl<T> Index<usize> for Matrix<T> {
+impl<T: Coefficient> Index<usize> for Matrix<T> {
     type Output = Vector<T>;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -63,13 +76,13 @@ impl<T> Index<usize> for Matrix<T> {
 }
 
 /// Direct access to a column (mutable)
-impl<T> IndexMut<usize> for Matrix<T> {
+impl<T: Coefficient> IndexMut<usize> for Matrix<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.columns[index]
     }
 }
 
-impl<T> fmt::Debug for Matrix<T>
+impl<T: Coefficient> fmt::Debug for Matrix<T>
 where
     T: Debug,
 {

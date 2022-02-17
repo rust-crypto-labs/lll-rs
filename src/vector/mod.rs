@@ -1,22 +1,17 @@
 //! Basic vector structures for LLL
 use std::{
-    fmt,
+    fmt::Debug,
     ops::{self, Index, IndexMut},
 };
 
 pub type VectorF = Vector<f64>;
 pub type BigVector = Vector<rug::Integer>;
 
-/// Implementation of a vector without generic coefficients
-#[derive(Clone)]
-pub struct Vector<T> {
-    /// Internal representation as a list of coefficients
-    coefficients: Vec<T>,
-}
-
 pub trait Coefficient:
     From<u32>
+    + PartialEq
     + Clone
+    + Debug
     + Default
     + for<'a> ops::Add<&'a Self, Output = Self>
     + for<'a> ops::Sub<&'a Self, Output = Self>
@@ -27,7 +22,9 @@ pub trait Coefficient:
 
 impl<T> Coefficient for T where
     T: From<u32>
+        + PartialEq
         + Clone
+        + Debug
         + Default
         + for<'a> ops::Add<&'a Self, Output = Self>
         + for<'a> ops::Sub<&'a Self, Output = Self>
@@ -36,12 +33,15 @@ impl<T> Coefficient for T where
 {
 }
 
-impl<T> Vector<T>
-where
-    T: Coefficient,
-{
-    #![allow(dead_code)]
-    fn basis_vector(dimension: usize, position: usize) -> Self {
+/// Implementation of a vector without generic coefficients
+#[derive(Clone, PartialEq, Debug)]
+pub struct Vector<T: Coefficient> {
+    /// Internal representation as a list of coefficients
+    coefficients: Vec<T>,
+}
+
+impl<T: Coefficient> Vector<T> {
+    pub fn basis_vector(dimension: usize, position: usize) -> Self {
         assert!(position < dimension);
 
         let coefficients = (0..dimension)
@@ -106,6 +106,15 @@ where
                 .collect(),
         )
     }
+    pub fn zero(dimension: usize) -> Self {
+        Self {
+            coefficients: vec![Default::default(); dimension],
+        }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self == &Vector::zero(self.dimension())
+    }
 }
 
 pub(crate) trait Dot {
@@ -135,7 +144,7 @@ impl Dot for VectorF {
     }
 }
 
-impl<T> Index<usize> for Vector<T> {
+impl<T: Coefficient> Index<usize> for Vector<T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &T {
@@ -143,17 +152,8 @@ impl<T> Index<usize> for Vector<T> {
     }
 }
 
-impl<T> IndexMut<usize> for Vector<T> {
+impl<T: Coefficient> IndexMut<usize> for Vector<T> {
     fn index_mut(&mut self, index: usize) -> &mut T {
         &mut self.coefficients[index]
-    }
-}
-
-impl<T> fmt::Debug for Vector<T>
-where
-    T: fmt::Debug,
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self.coefficients)
     }
 }
