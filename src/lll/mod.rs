@@ -32,7 +32,7 @@ where
 
                 let b_i = &basis[i];
                 let b_j = &basis[j];
-                let alpha: S::Integer = S::round_div(b_i.dot(&b_j), b_j.dot(&b_j));
+                let alpha: S::Integer = S::round_div(b_i.dot(b_j), b_j.dot(b_j));
                 basis[i] = b_i.sub(&b_j.mulf(&alpha));
             }
         }
@@ -43,9 +43,9 @@ where
             let b_i = &basis[i];
             let b_ip1 = &basis[i + 1];
 
-            let lhs: S::Fraction = S::Fraction::from_ext(&b_i.dot(&b_i)) * &delta;
+            let lhs: S::Fraction = S::Fraction::from_ext(&b_i.dot(b_i)) * &delta;
 
-            let alpha = S::round_div(b_ip1.dot(&b_i), b_i.dot(&b_i));
+            let alpha = S::round_div(b_ip1.dot(b_i), b_i.dot(b_i));
             let vec_rhs = b_ip1.add(&b_i.mulf(&alpha));
             let rhs = vec_rhs.dot(&vec_rhs);
 
@@ -70,6 +70,7 @@ pub mod biglll {
     ///   - `basis`: A generating matrix for the lattice
     ///
     /// The basis is reduced in-place.
+    #[deprecated(note = "Current implementation might yield incorrect results. Use bigl2 instead")]
     pub fn lattice_reduce(basis: &mut Matrix<rug::Integer>) {
         super::lattice_reduce::<BigNum>(basis)
     }
@@ -87,6 +88,7 @@ pub mod lllf {
     ///   - `basis`: A generating matrix for the lattice
     ///
     /// The basis is reduced in-place.
+    #[deprecated(note = "Current implementation might yield incorrect results. Use l2f instead")]
     pub fn lattice_reduce(basis: &mut Matrix<f64>) {
         super::lattice_reduce::<Float>(basis)
     }
