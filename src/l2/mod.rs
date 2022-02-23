@@ -43,9 +43,6 @@ fn lattice_reduce<S: Scalar>(basis: &mut Matrix<S::Integer>, eta: f64, delta: f6
     let mut kappa = 1;
 
     while kappa < (d - zeros) {
-        println!("Before size reduce:");
-        println!("{:?}", &basis);
-        println!("-------------------");
         size_reduce::<S>(basis, &mut gram, &mut mu, &mut r, kappa, &eta_minus);
 
         s[0] = S::Fraction::from_ext((gram[kappa][kappa].clone(), S::Integer::from(1)));
