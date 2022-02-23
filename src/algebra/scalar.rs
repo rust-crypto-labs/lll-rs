@@ -1,7 +1,42 @@
 use rug::{Integer, Rational};
-use std::{cmp, ops};
+use std::{
+    cmp::PartialOrd,
+    fmt::Debug,
+    iter::Sum,
+    ops::{Add, Div, Mul, Sub, SubAssign},
+};
 
-pub(crate) trait FromExt<T> {
+pub trait Coefficient:
+    From<i32>
+    + PartialEq
+    + PartialOrd<Self>
+    + Clone
+    + Debug
+    + Default
+    + for<'a> Add<&'a Self, Output = Self>
+    + for<'a> Sub<&'a Self, Output = Self>
+    + for<'a> SubAssign<&'a Self>
+    + for<'a> Mul<&'a Self, Output = Self>
+    + Sum<Self>
+{
+}
+
+impl<T> Coefficient for T where
+    T: From<i32>
+        + PartialEq
+        + PartialOrd<Self>
+        + Clone
+        + Debug
+        + Default
+        + for<'a> Add<&'a Self, Output = Self>
+        + for<'a> Sub<&'a Self, Output = Self>
+        + for<'a> SubAssign<&'a Self>
+        + for<'a> Mul<&'a Self, Output = Self>
+        + Sum<Self>
+{
+}
+
+pub trait FromExt<T> {
     fn from_ext(_: T) -> Self;
 }
 
@@ -15,17 +50,15 @@ macro_rules! impl_from_ext {
     };
 }
 
-pub(crate) trait Scalars {
-    type Integer;
-    type Fraction: cmp::PartialOrd<Self::Integer>
-        + for<'a> FromExt<&'a Self::Integer>
+pub trait Scalar {
+    type Integer: Coefficient;
+    type Fraction: Coefficient
+        + PartialOrd<Self::Integer>
         + FromExt<f64>
         + FromExt<(Self::Integer, Self::Integer)>
         + FromExt<(i32, i32)>
-        + cmp::PartialOrd<Self::Fraction>
-        + for<'a> ops::Mul<&'a Self::Fraction, Output = Self::Fraction>
-        + for<'a> ops::Div<&'a Self::Fraction, Output = Self::Fraction>
-        + for<'a> ops::SubAssign<&'a Self::Fraction>;
+        + for<'a> FromExt<&'a Self::Integer>
+        + for<'a> Div<&'a Self::Fraction, Output = Self::Fraction>;
 
     fn round(n: &Self::Fraction) -> Self::Integer;
     fn round_div(n: Self::Integer, d: Self::Integer) -> Self::Integer;
@@ -37,8 +70,9 @@ impl_from_ext!((f64, f64), f64, |(n, d)| n / d);
 impl_from_ext!(f64, f64, |f| f);
 impl_from_ext!((i32, i32), f64, |(n, d)| f64::from(n) / f64::from(d));
 
-pub(crate) struct Float;
-impl Scalars for Float {
+pub struct Float;
+
+impl Scalar for Float {
     type Integer = f64;
     type Fraction = f64;
 
@@ -62,8 +96,9 @@ impl_from_ext!((Integer, Integer), Rational, |(n, d)| Rational::from((
 impl_from_ext!(f64, Rational, |f: f64| Rational::from_f64(f).unwrap());
 impl_from_ext!((i32, i32), Rational, |(n, d)| Rational::from((n, d)));
 
-pub(crate) struct BigNum;
-impl Scalars for BigNum {
+pub struct BigNum;
+
+impl Scalar for BigNum {
     type Integer = rug::Integer;
     type Fraction = rug::Rational;
 

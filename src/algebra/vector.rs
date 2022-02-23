@@ -1,40 +1,13 @@
 //! Basic vector structures for LLL
+use super::Coefficient;
+
 use std::{
-    fmt::Debug,
-    ops::{self, Index, IndexMut},
+    fmt,
+    ops::{Index, IndexMut},
 };
 
-pub type VectorF = Vector<f64>;
-pub type BigVector = Vector<rug::Integer>;
-
-pub trait Coefficient:
-    From<u32>
-    + PartialEq
-    + Clone
-    + Debug
-    + Default
-    + for<'a> ops::Add<&'a Self, Output = Self>
-    + for<'a> ops::Sub<&'a Self, Output = Self>
-    + for<'a> std::ops::Mul<&'a Self, Output = Self>
-    + std::iter::Sum<Self>
-{
-}
-
-impl<T> Coefficient for T where
-    T: From<u32>
-        + PartialEq
-        + Clone
-        + Debug
-        + Default
-        + for<'a> ops::Add<&'a Self, Output = Self>
-        + for<'a> ops::Sub<&'a Self, Output = Self>
-        + for<'a> std::ops::Mul<&'a Self, Output = Self>
-        + std::iter::Sum<Self>
-{
-}
-
 /// Implementation of a vector without generic coefficients
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq)]
 pub struct Vector<T: Coefficient> {
     /// Internal representation as a list of coefficients
     coefficients: Vec<T>,
@@ -97,12 +70,12 @@ impl<T: Coefficient> Vector<T> {
     }
 
     /// Multiplication by a scalar
-    pub fn mulf(&self, other: &T) -> Self {
+    pub fn mulf(&self, other: T) -> Self {
         let n = self.dimension();
 
         Self::from_vector(
             (0..n)
-                .map(|i| self.coefficients[i].clone() * other)
+                .map(|i| self.coefficients[i].clone() * &other)
                 .collect(),
         )
     }
@@ -115,31 +88,12 @@ impl<T: Coefficient> Vector<T> {
     pub fn is_zero(&self) -> bool {
         self == &Vector::zero(self.dimension())
     }
-}
 
-pub(crate) trait Dot {
-    type Output;
-    fn dot(&self, other: &Self) -> Self::Output;
-}
-
-impl Dot for BigVector {
-    type Output = rug::Integer;
-    fn dot(&self, other: &Self) -> Self::Output {
+    pub fn dot(&self, other: &Self) -> T {
         self.coefficients
             .iter()
             .zip(&other.coefficients)
-            .map(|(coeff_r, coeff_l)| coeff_r * coeff_l)
-            .sum()
-    }
-}
-
-impl Dot for VectorF {
-    type Output = f64;
-    fn dot(&self, other: &Self) -> Self::Output {
-        self.coefficients
-            .iter()
-            .zip(&other.coefficients)
-            .map(|(coeff_r, coeff_l)| coeff_r * coeff_l)
+            .map(|(coeff_r, coeff_l)| coeff_r.clone() * coeff_l)
             .sum()
     }
 }
@@ -157,3 +111,12 @@ impl<T: Coefficient> IndexMut<usize> for Vector<T> {
         &mut self.coefficients[index]
     }
 }
+
+impl<T: Coefficient> fmt::Debug for Vector<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "{:?}\n", self.coefficients)
+    }
+}
+/*
+pub type VectorF = Vector<Float>;
+pub type BigVector = Vector<BigNum>;*/

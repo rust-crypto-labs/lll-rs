@@ -52,21 +52,15 @@
 //!
 extern crate rug;
 
+mod algebra;
 pub mod l2;
 pub mod lll;
-pub mod matrix;
-mod scalars;
-pub mod vector;
+
+pub use algebra::{BigNum, Float, Matrix};
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        l2::{bigl2, l2f},
-        lll::{biglll, lllf},
-        matrix::Matrix,
-    };
-
-    use rug::Integer;
+    use crate::{l2, lll, Matrix};
 
     #[test]
     fn test_lllf() {
@@ -78,7 +72,7 @@ mod test {
         ]);
 
         // "Good" lattice basis
-        lllf::lattice_reduce(&mut basis);
+        lll::lll_float(&mut basis);
 
         let result: Matrix<f64> = Matrix::from_matrix(vec![
             vec![0.0, -4.0, 1.0, 14.0],
@@ -91,7 +85,7 @@ mod test {
 
     #[test]
     fn test_biglll() {
-        type I = Integer;
+        type I = rug::Integer;
         // "Bad" lattice basis
         let mut basis: Matrix<I> = Matrix::from_matrix(vec![
             vec![I::from(1) << 100000, I::from(0), I::from(0), I::from(1345)],
@@ -101,7 +95,7 @@ mod test {
         println!("{:?}", basis);
 
         // "Good" lattice basis
-        biglll::lattice_reduce(&mut basis);
+        lll::lll_bignum(&mut basis);
         println!("{:?}", basis);
     }
 
@@ -116,7 +110,7 @@ mod test {
         println!("{:?}", basis);
 
         // "Good" lattice basis
-        l2f::lattice_reduce(&mut basis, 0.501, 0.998);
+        l2::lll_float(&mut basis, 0.501, 0.998);
         println!("{:?}", basis);
 
         let result: Matrix<f64> = Matrix::from_matrix(vec![
@@ -130,7 +124,7 @@ mod test {
 
     #[test]
     fn test_bigl2() {
-        type I = Integer;
+        type I = rug::Integer;
         let mut basis: Matrix<I> = Matrix::from_matrix(vec![
             vec![I::from(1), I::from(2), I::from(3)],
             vec![I::from(4), I::from(5), I::from(6)],
@@ -138,13 +132,124 @@ mod test {
         ]);
         println!("{:?}", basis);
 
-        bigl2::lattice_reduce(&mut basis, 0.6, 0.95);
+        l2::lll_bignum(&mut basis, 0.6, 0.95);
         println!("{:?}", basis);
 
         let result: Matrix<I> = Matrix::from_matrix(vec![
             vec![I::from(0), I::from(0), I::from(0)],
             vec![I::from(2), I::from(1), I::from(0)],
             vec![I::from(-1), I::from(1), I::from(3)],
+        ]);
+        assert_eq!(basis, result);
+    }
+
+    #[test]
+    fn test_bigl2_ntrulike() {
+        type I = rug::Integer;
+        let mut basis: Matrix<I> = Matrix::from_matrix(vec![
+            vec![
+                I::from(1),
+                I::from(0),
+                I::from(0),
+                I::from(436),
+                I::from(225),
+                I::from(381),
+            ],
+            vec![
+                I::from(0),
+                I::from(1),
+                I::from(0),
+                I::from(381),
+                I::from(436),
+                I::from(225),
+            ],
+            vec![
+                I::from(0),
+                I::from(0),
+                I::from(1),
+                I::from(225),
+                I::from(381),
+                I::from(436),
+            ],
+            vec![
+                I::from(0),
+                I::from(0),
+                I::from(0),
+                I::from(521),
+                I::from(0),
+                I::from(0),
+            ],
+            vec![
+                I::from(0),
+                I::from(0),
+                I::from(0),
+                I::from(0),
+                I::from(521),
+                I::from(0),
+            ],
+            vec![
+                I::from(0),
+                I::from(0),
+                I::from(0),
+                I::from(0),
+                I::from(0),
+                I::from(521),
+            ],
+        ]);
+        println!("{:?}", basis);
+
+        l2::lll_bignum(&mut basis, 0.6, 0.95);
+        println!("{:?}", basis);
+
+        let result: Matrix<I> = Matrix::from_matrix(vec![
+            vec![
+                I::from(1),
+                I::from(1),
+                I::from(1),
+                I::from(0),
+                I::from(0),
+                I::from(0),
+            ],
+            vec![
+                I::from(-11),
+                I::from(0),
+                I::from(12),
+                I::from(-12),
+                I::from(13),
+                I::from(-1),
+            ],
+            vec![
+                I::from(12),
+                I::from(-11),
+                I::from(0),
+                I::from(-1),
+                I::from(-12),
+                I::from(13),
+            ],
+            vec![
+                I::from(12),
+                I::from(-1),
+                I::from(-10),
+                I::from(-4),
+                I::from(17),
+                I::from(-13),
+            ],
+            vec![
+                I::from(1),
+                I::from(10),
+                I::from(-12),
+                I::from(-17),
+                I::from(13),
+                I::from(4),
+            ],
+            vec![
+                I::from(8),
+                I::from(-5),
+                I::from(-4),
+                I::from(162),
+                I::from(180),
+                I::from(179),
+            ],
         ]);
         assert_eq!(basis, result);
     }

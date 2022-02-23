@@ -6,61 +6,63 @@ extern crate rug;
 mod benchmarks {
     use criterion::Criterion;
 
-    use lll_rs::{l2, lll, matrix::Matrix, vector::BigVector};
-
-    use rug::Integer;
+    use lll_rs::{l2, lll, Matrix};
 
     pub fn bench_big_int_reduction_lll(c: &mut Criterion) {
+        type I = rug::Integer;
         // "Bad" lattice basis
-        let mut basis: Matrix<Integer> = Matrix::init(3, 4);
-        basis[0] = BigVector::from_vector(vec![
-            Integer::from(1) << 10000,
-            Integer::from(0),
-            Integer::from(0),
-            Integer::from(1345) << 789,
-        ]);
-        basis[1] = BigVector::from_vector(vec![
-            Integer::from(0),
-            Integer::from(1) << 500,
-            Integer::from(0),
-            Integer::from(35) << 3505,
-        ]);
-        basis[2] = BigVector::from_vector(vec![
-            Integer::from(0),
-            Integer::from(0),
-            Integer::from(1) << 1000,
-            Integer::from(154) << 5000,
+        let mut basis: Matrix<I> = Matrix::from_matrix(vec![
+            vec![
+                I::from(1) << 10000,
+                I::from(0),
+                I::from(0),
+                I::from(1345) << 789,
+            ],
+            vec![
+                I::from(0),
+                I::from(1) << 500,
+                I::from(0),
+                I::from(35) << 3505,
+            ],
+            vec![
+                I::from(0),
+                I::from(0),
+                I::from(1) << 1000,
+                I::from(154) << 5000,
+            ],
         ]);
 
         c.bench_function("lattice_reduce (biglll)", move |b| {
-            b.iter(|| lll::biglll::lattice_reduce(&mut basis))
+            b.iter(|| lll::lll_bignum(&mut basis))
         });
     }
 
     pub fn bench_big_int_reduction_l2(c: &mut Criterion) {
+        type I = rug::Integer;
         // "Bad" lattice basis
-        let mut basis: Matrix<Integer> = Matrix::init(3, 4);
-        basis[0] = BigVector::from_vector(vec![
-            Integer::from(1) << 10000,
-            Integer::from(0),
-            Integer::from(0),
-            Integer::from(1345) << 789,
-        ]);
-        basis[1] = BigVector::from_vector(vec![
-            Integer::from(0),
-            Integer::from(1) << 500,
-            Integer::from(0),
-            Integer::from(35) << 3505,
-        ]);
-        basis[2] = BigVector::from_vector(vec![
-            Integer::from(0),
-            Integer::from(0),
-            Integer::from(1) << 1000,
-            Integer::from(154) << 5000,
+        let mut basis: Matrix<I> = Matrix::from_matrix(vec![
+            vec![
+                I::from(1) << 10000,
+                I::from(0),
+                I::from(0),
+                I::from(1345) << 789,
+            ],
+            vec![
+                I::from(0),
+                I::from(1) << 500,
+                I::from(0),
+                I::from(35) << 3505,
+            ],
+            vec![
+                I::from(0),
+                I::from(0),
+                I::from(1) << 1000,
+                I::from(154) << 5000,
+            ],
         ]);
 
         c.bench_function("lattice_reduce (bigl2)", move |b| {
-            b.iter(|| l2::bigl2::lattice_reduce(&mut basis, 0.501, 0.998))
+            b.iter(|| l2::lll_bignum(&mut basis, 0.501, 0.998))
         });
     }
 }
