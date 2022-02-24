@@ -24,9 +24,10 @@ fn lattice_reduce<S: Scalar>(basis: &mut Matrix<S::Integer>, eta: f64, delta: f6
     let mut r: Matrix<S::Fraction> = Matrix::init(d, d); // r_ij matrix
     let mut mu: Matrix<S::Fraction> = Matrix::init(d, d); // Gram coefficient matrix
     let mut s: Vector<S::Fraction> = Vector::init(d);
+    let mut m = Vector::init(d);
 
     let zero = S::Fraction::from(0);
-    let mut zeros = 0;
+    let mut num_zeros = 0;
 
     // Computing Gram matrix
     for i in 0..d {
@@ -42,36 +43,38 @@ fn lattice_reduce<S: Scalar>(basis: &mut Matrix<S::Integer>, eta: f64, delta: f6
 
     let mut kappa = 1;
 
-    while kappa < (d - zeros) {
-        size_reduce::<S>(basis, &mut gram, &mut mu, &mut r, kappa, &eta_minus);
+    while kappa < (d - num_zeros) {
+        size_reduce::<S>(basis, &mut gram, &mut mu, &mut r, &mut m, kappa, &eta_minus);
 
         s[0] = S::Fraction::from_ext((gram[kappa][kappa].clone(), S::Integer::from(1)));
         for i in 0..kappa {
             s[i + 1] = s[i].clone() - &(mu[kappa][i].clone() * &r[kappa][i]);
         }
 
-        let delta_criterion = delta_plus.clone() * &r[kappa - 1][kappa - 1];
+        let delta_criterion = |k| delta_plus.clone() * &r[k - 1][k - 1];
 
-        if delta_criterion > s[kappa - 1] {
+        if delta_criterion(kappa) > s[kappa - 1] {
             let kappa_prime = kappa;
-            while kappa >= 1 && delta_criterion >= s[kappa - 1] {
-                kappa -= 1;
-            }
 
-            let is_neg = s[kappa] <= zero;
+            let index = (1..kappa)
+                .rev()
+                .find(|&k| delta_criterion(k) < s[k - 1])
+                .unwrap_or(0);
+
+            let is_neg = s[index] <= zero;
 
             let k = if !is_neg {
-                kappa
+                kappa = index;
+                index
             } else {
-                zeros += 1;
-                d - zeros
+                num_zeros += 1;
+                kappa = kappa_prime;
+                d - num_zeros
             };
 
-            if k != kappa_prime {
-                basis.insert(kappa_prime, k);
-                mu.insert(kappa_prime, k);
-                r.insert(kappa_prime, k)
-            }
+            basis.insert(kappa_prime, k);
+            mu.insert(kappa_prime, k);
+            r.insert(kappa_prime, k);
 
             // Update Gram matrix
             for i in 0..d {
@@ -81,7 +84,6 @@ fn lattice_reduce<S: Scalar>(basis: &mut Matrix<S::Integer>, eta: f64, delta: f6
             }
 
             if is_neg {
-                kappa = kappa_prime;
                 continue;
             }
         }
@@ -107,6 +109,7 @@ fn size_reduce<S: Scalar>(
     gram: &mut Matrix<S::Integer>,
     mu: &mut Matrix<S::Fraction>,
     r: &mut Matrix<S::Fraction>,
+    m: &mut Vector<S::Fraction>,
     kappa: usize,
     eta: &S::Fraction,
 ) {
@@ -123,7 +126,9 @@ fn size_reduce<S: Scalar>(
             break;
         }
 
-        let mut m = mu[kappa].clone();
+        for i in 0..kappa {
+            m[i] = mu[kappa][i].clone()
+        }
 
         for i in (0..kappa).rev() {
             let x_i = S::round(&m[i]);

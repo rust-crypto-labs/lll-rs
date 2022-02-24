@@ -77,7 +77,12 @@ impl Scalar for Float {
     type Fraction = f64;
 
     fn round(f: &Self::Fraction) -> Self::Integer {
-        f.round()
+        let (int, fract) = (f.trunc(), f.fract());
+        if fract.abs() > 0.5 {
+            f.signum() * (int.abs() + 1.)
+        } else {
+            int
+        }
     }
 
     fn round_div(n: Self::Integer, d: Self::Integer) -> Self::Integer {
@@ -103,7 +108,12 @@ impl Scalar for BigNum {
     type Fraction = rug::Rational;
 
     fn round(f: &Self::Fraction) -> Self::Integer {
-        f.round_ref().into()
+        let (fract, trunc) = f.clone().fract_trunc(Integer::new());
+        if fract.abs() > (1_u16, 2_u16) {
+            f.clone().signum().numer() * (trunc.abs() + Integer::from(1))
+        } else {
+            trunc
+        }
     }
 
     fn round_div(mut n: Self::Integer, mut d: Self::Integer) -> Self::Integer {
