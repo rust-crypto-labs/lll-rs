@@ -114,7 +114,7 @@ impl<T: Coefficient> IndexMut<usize> for Vector<T> {
 
 impl<T: Coefficient> fmt::Debug for Vector<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "{:?}\n", self.coefficients)
+        writeln!(f, "{:?}", self.coefficients)
     }
 }
 /*

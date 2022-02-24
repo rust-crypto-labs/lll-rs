@@ -84,6 +84,6 @@ impl<T: Coefficient> IndexMut<usize> for Matrix<T> {
 
 impl<T: Coefficient> fmt::Debug for Matrix<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "{:?}\n", self.columns)
+        writeln!(f, "{:?}", self.columns)
     }
 }
